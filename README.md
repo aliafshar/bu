@@ -11,6 +11,7 @@ of make. You define a set of tasks and it will run them.
 - [Imports](#imports)
 - [Comments](#comments)
 
+Here is a tiny example.
 
     run:
         echo I run something.
