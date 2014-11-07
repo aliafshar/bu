@@ -1,0 +1,20 @@
+
+
+< main.bu go.bu
+
+shell_eg:
+  echo "Hi! I am bu."
+
+py_eg: !py
+  print "Hi! I am a Python bu."
+  for i in range(3):
+    print i
+
+MYVAR = myvalue banana
+
+shell_var_eg:
+  echo My variable is $MYVAR
+
+shell_dep_eg: shell_var_eg py_eg shell_eg
+  echo I depend on some stuff.
+

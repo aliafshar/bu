@@ -1,0 +1,10 @@
+# Bu file for bu itself
+
+run:
+  go run cmd/bu.go
+
+MYVAR = othervalue fanana
+
+imported_test:
+  echo Import!
+  echo imported variable $MYVAR
