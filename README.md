@@ -54,9 +54,14 @@ be consistent for Python scripts since Python is sensitive to this.
     myvariable = I am the variable content
 
 Defines a variable `myvariable`. Quoting is not required as the variable value
-is taken to the end of the line. Variables are injected into the environment,
+is taken to the end of the line.
+
+Variables are injected into the environment,
 where they can be used directly in targets as `$myvariable` in shell, or
 `os.getenv('myvariable')` from Python.
+
+Note: Because variables are injected only into the environment, they will not be
+used in target names and dependencies.
 
 ## Imports
 
@@ -68,6 +73,7 @@ Will import foo.bu from the system path, which defaults to resolving, in order:
 * Bu home directory `~/.bu`
 
 ## Comments  
+
 Line comments only. Non-line comments are undefined, especially in situations
 where values are taken to the end of a line, e.g. variable definitions
 
