@@ -3,7 +3,6 @@ package bu
 import (
 	"github.com/aliafshar/toylog"
 	"strings"
-  "fmt"
 )
 
 type parser struct {
@@ -141,15 +140,5 @@ func (p *parser) finalize() {
 	for _, t := range p.module.targets {
 		p.module.targetIndex[t.name] = t
 		t.body = trimJoinBody(t.bodyLines)
-	}
-	for _, t := range p.module.targets {
-		for _, dn := range t.depsNames {
-			if d, ok := p.module.targetIndex[dn]; ok {
-				t.deps = append(t.deps, d)
-			} else {
-        parseError(fmt.Sprintf("Missing dependency %q.", t.name), t.tokens[0])
-				return
-			}
-		}
 	}
 }

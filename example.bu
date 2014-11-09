@@ -18,3 +18,10 @@ shell_var_eg:
 shell_dep_eg: shell_var_eg py_eg shell_eg
   echo I depend on some stuff.
 
+long:
+  sleep 1
+  ls
+  sleep 1
+  ls
+  exit 1
+

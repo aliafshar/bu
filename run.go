@@ -121,23 +121,17 @@ var runners = map[string]string{
 }
 
 func (w *worker) runTarget(t *target) {
-  toylog.Infof("< %q. [worker:%v]", t.body, w.id)
-	cmd := runners[t.typ]
-	c := exec.Command(cmd, "-c", t.body)
-	o, err := c.CombinedOutput()
+  toylog.Infof("> [%v] %#v [worker:%v]", t.name, t.body, w.id)
+	shell := runners[t.typ]
+	cmd := exec.Command(shell, "-c", t.body)
+  cmd.Stdout = os.Stdout
+  cmd.Stderr = os.Stderr
+  err := cmd.Run()
 	if err != nil {
-		toylog.Errorln("Run error.", err)
-	}
-  toylog.Infof("> %s", o)
-}
-
-type runner struct {
-	out    <-chan []byte
-	status <-chan int
-}
-
-func Newrunner() *runner {
-	return &runner{out: make(chan []byte), status: make(chan int)}
+    toylog.Errorf("< [%v] failure, %v", t.name, err)
+	} else {
+    toylog.Infof("< [%v] success", t.name)
+  }
 }
 
 func Run(s *script, t *target) {
