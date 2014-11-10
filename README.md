@@ -8,6 +8,7 @@ of make. You define a set of tasks and it will run them.
   - [Target types](#target-types)
   - [Indentation](#indentation)
 - [Variables](#variables)
+- [Questions](#questions)
 - [Imports](#imports)
 - [Comments](#comments)
 
@@ -62,6 +63,24 @@ where they can be used directly in targets as `$myvariable` in shell, or
 
 Note: Because variables are injected only into the environment, they will not be
 used in target names and dependencies.
+
+## Questions
+
+    confirm ? n
+        Are you sure? (y/n)
+
+Will prompt the user on the command line and store the value in the variable
+`confirm` with a default value of `n`. Questions are targets and can be depended
+on by other targets.
+
+    danger: confirm
+      if [ $confirm -eq y ]; then
+      ...
+
+Default values are optional, with the syntax:
+
+    <name> ? [default]
+        <question>
 
 ## Imports
 

@@ -21,14 +21,15 @@ const (
 	tokenPling      tokenType = "PLING"
 	tokenNewline    tokenType = "NEWLINE"
 	tokenWhitespace tokenType = "WHITESPACE"
-  tokenIndent     tokenType = "INDENT"
+	tokenIndent     tokenType = "INDENT"
 	tokenEof        tokenType = "EOF"
 	tokenSof        tokenType = "SOF"
 	tokenRaw        tokenType = "RAW"
 	tokenComment    tokenType = "COMMENT"
-  tokenLessthan tokenType = "LESSTHAN"
+	tokenLessthan   tokenType = "LESSTHAN"
+	tokenQuestion   tokenType = "QUESTION"
 	eof                       = 4
-  lf = 10
+	lf                        = 10
 )
 
 var keywords = map[string]tokenType{
@@ -39,14 +40,15 @@ var keywords = map[string]tokenType{
 	" ":  tokenWhitespace,
 	"\t": tokenWhitespace,
 	"#":  tokenComment,
-  "<": tokenLessthan,
+	"<":  tokenLessthan,
+	"?":  tokenQuestion,
 }
 
 type token struct {
-	typ tokenType
-	pos pos
-  line int
-	val []rune
+	typ  tokenType
+	pos  pos
+	line int
+	val  []rune
 }
 
 func (i *token) String() string {
@@ -93,26 +95,25 @@ func (l *lexer) isCurrent(typ tokenType) bool {
 }
 
 func (l *lexer) shouldRaw() bool {
-	return l.isLast(tokenEquals) || l.isLast(tokenComment) || l.isLast(tokenIndent)
+	return l.isLast(tokenEquals) || l.isLast(tokenComment) || l.isLast(tokenIndent) || l.isLast(tokenQuestion)
 }
 
 func (l *lexer) doRaw(r rune, char int) {
-  if l.isLast(tokenEquals) {
-    l.newToken(tokenRaw, r, char)
-  } else {
+	if l.isLast(tokenEquals) || l.isLast(tokenQuestion) {
+		l.newToken(tokenRaw, r, char)
+	} else {
 		l.newToken(tokenRaw, l.lastToken.val[0], char)
 		l.extendToken(r)
-  }
+	}
 }
 
 func (l *lexer) shouldIndent() bool {
-  return l.isCurrent(tokenWhitespace) && (l.isLast(tokenNewline) || l.isLast(tokenSof))
+	return l.isCurrent(tokenWhitespace) && (l.isLast(tokenNewline) || l.isLast(tokenSof))
 }
 
 func (l *lexer) doIndent(r rune, char int) {
-  l.newToken(tokenIndent, r, char)
+	l.newToken(tokenIndent, r, char)
 }
-
 
 func (l *lexer) isExtendable() bool {
 	return l.isCurrentEqualsLast() &&
@@ -120,7 +121,7 @@ func (l *lexer) isExtendable() bool {
 }
 
 func (l *lexer) newToken(typ tokenType, r rune, char int) {
-  t := &token{typ: typ, val: []rune{r}, pos: pos{start: char, end: char + 1}}
+	t := &token{typ: typ, val: []rune{r}, pos: pos{start: char, end: char + 1}}
 	l.out <- l.lastToken
 	l.last2Token = l.lastToken
 	l.lastToken = t
@@ -129,7 +130,7 @@ func (l *lexer) newToken(typ tokenType, r rune, char int) {
 
 func (l *lexer) extendToken(r rune) {
 	l.lastToken.val = append(l.lastToken.val, r)
-  l.lastToken.pos.end++
+	l.lastToken.pos.end++
 }
 
 func (l *lexer) eof() {
@@ -145,14 +146,14 @@ func (l *lexer) feed(r rune, char int) {
 		l.extendToken(r)
 		return // otherwise drop out of raw mode
 	}
-	if l.shouldRaw() {
-    l.doRaw(r, char)
+	if l.shouldRaw() && !l.isCurrent(tokenNewline) {
+		l.doRaw(r, char)
 		return
 	}
-  if l.shouldIndent() {
-    l.doIndent(r, char)
-    return
-  }
+	if l.shouldIndent() {
+		l.doIndent(r, char)
+		return
+	}
 	if !isKw {
 		l.currentTokenType = tokenName
 	}

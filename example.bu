@@ -12,6 +12,9 @@ py_eg: !py
 
 MYVAR = myvalue banana
 
+CONFIRM ? n
+  Are you sure (y/n)?
+
 shell_var_eg:
   echo My variable is $MYVAR
 
@@ -24,4 +27,17 @@ long:
   sleep 1
   ls
   exit 1
+
+danger: CONFIRM
+  if [ $CONFIRM -q y ]; then
+    echo "Confirmed, do it!"
+  else
+    echo "Not Confirmed :("
+  fi
+
+template ?
+  Enter the template
+
+longvar: template
+  echo $template
 

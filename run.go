@@ -1,33 +1,34 @@
 package bu
 
 import (
-  "os"
+	"github.com/aliafshar/toylog"
+	"github.com/aliafshar/weezard"
+	"os"
 	"os/exec"
 	"sync"
 	"time"
-  "github.com/aliafshar/toylog"
 )
 
 type targetQueue struct {
-	items []*target
+	items []target
 	done  map[string]bool
 	sync.Mutex
 }
 
-func (q *targetQueue) build(t *target) {
+func (q *targetQueue) build(t target) {
 	q.items = append(q.items, t)
-	for _, u := range t.deps {
+	for _, u := range t.Deps() {
 		q.build(u)
 	}
 }
 
-func newTargetQueue(t *target) *targetQueue {
-	q := &targetQueue{items: []*target{}, done: make(map[string]bool)}
+func newTargetQueue(t target) *targetQueue {
+	q := &targetQueue{items: []target{}, done: make(map[string]bool)}
 	q.build(t)
 	return q
 }
 
-func (q *targetQueue) peek() *target {
+func (q *targetQueue) peek() target {
 	q.Lock()
 	defer q.Unlock()
 	if len(q.items) == 0 {
@@ -44,7 +45,7 @@ func (q *targetQueue) rotate() {
 	}
 }
 
-func (q *targetQueue) pop() *target {
+func (q *targetQueue) pop() target {
 	q.Lock()
 	defer q.Unlock()
 	if len(q.items) == 0 {
@@ -55,25 +56,25 @@ func (q *targetQueue) pop() *target {
 	return t
 }
 
-func (q *targetQueue) markDone(t *target) {
+func (q *targetQueue) markDone(t target) {
 	q.Lock()
 	defer q.Unlock()
-	q.done[t.name] = true
+	q.done[t.Name()] = true
 }
 
-func (q *targetQueue) hasDone(ts ...*target) bool {
+func (q *targetQueue) hasDone(ts ...target) bool {
 	q.Lock()
 	defer q.Unlock()
 	for _, t := range ts {
-		if !q.done[t.name] {
+		if !q.done[t.Name()] {
 			return false
 		}
 	}
 	return true
 }
 
-func (q *targetQueue) canRun(t *target) bool {
-	return q.hasDone(t.deps...)
+func (q *targetQueue) canRun(t target) bool {
+	return q.hasDone(t.Deps()...)
 }
 
 type pool struct {
@@ -120,25 +121,40 @@ var runners = map[string]string{
 	"":   "bash",
 }
 
-func (w *worker) runTarget(t *target) {
-  toylog.Infof("> [%v] %#v [worker:%v]", t.name, t.body, w.id)
-	shell := runners[t.typ]
-	cmd := exec.Command(shell, "-c", t.body)
-  cmd.Stdout = os.Stdout
-  cmd.Stderr = os.Stderr
-  err := cmd.Run()
-	if err != nil {
-    toylog.Errorf("< [%v] failure, %v", t.name, err)
-	} else {
-    toylog.Infof("< [%v] success", t.name)
-  }
+func (w *worker) runTarget(t target) {
+	t.Run()
 }
 
-func Run(s *script, t *target) {
+func (t *shellTarget) Run() {
+	toylog.Infof("> [%v] %v:%#v", t.Name(), t.typ, t.body)
+	shell := runners[t.typ]
+	cmd := exec.Command(shell, "-c", t.body)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		toylog.Errorf("< [%v] failure, %v", t.name, err)
+	} else {
+		toylog.Infof("< [%v] success", t.name)
+	}
+}
+
+func (t *questionTarget) Run() {
+	toylog.Infof("> [%v] question: %#v", t.Name(), t.usage)
+	q := &weezard.Question{Usage: t.usage, Default: t.dflt}
+	v, err := weezard.AskQuestion(q)
+	if err != nil {
+		toylog.Errorf("< [%v] failure, %v", t.Name(), err)
+	}
+	os.Setenv(t.Name(), v)
+	toylog.Infof("< [%v] success $%v=%q", t.Name(), t.Name(), v)
+}
+
+func Run(s *script, t target) {
 	q := newTargetQueue(t)
-  for _, setvar := range s.setvars {
-    os.Setenv(setvar.key, setvar.value)
-  }
+	for _, setvar := range s.setvars {
+		os.Setenv(setvar.key, setvar.value)
+	}
 	p := &pool{Size: 4}
 	p.start(q)
 }
