@@ -128,7 +128,7 @@ func (w *worker) runTarget(t target) {
 func (t *shellTarget) Run() {
 	toylog.Infof("> [%v] %v:%#v", t.Name(), t.typ, t.body)
 	shell := runners[t.typ]
-  args := append([]string{"-c", t.body}, t.args...)
+  args := append([]string{"-c", t.body, t.Name()}, t.args...)
 	cmd := exec.Command(shell, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

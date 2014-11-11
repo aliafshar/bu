@@ -45,7 +45,17 @@ be consistent for Python scripts since Python is sensitive to this.
 
 ## Variables
 
-    myvariable = I am the variable content
+Single line variables are defined with the `=` operator
+
+    myvariable =I am the variable content
+
+Multiline variables are defined with the `=|` operator followed by a block.
+
+    myvariable =|
+        I
+        am
+        the variable
+        content
 
 Defines a variable `myvariable`. Quoting is not required as the variable value
 is taken to the end of the line.
