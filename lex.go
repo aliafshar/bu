@@ -28,6 +28,7 @@ const (
 	tokenComment    tokenType = "COMMENT"
 	tokenLessthan   tokenType = "LESSTHAN"
 	tokenQuestion   tokenType = "QUESTION"
+  tokenPipe tokenType = "PIPE"
 	eof                       = 4
 	lf                        = 10
 )
@@ -42,6 +43,7 @@ var keywords = map[string]tokenType{
 	"#":  tokenComment,
 	"<":  tokenLessthan,
 	"?":  tokenQuestion,
+  "|":  tokenPipe,
 }
 
 type token struct {
@@ -146,7 +148,7 @@ func (l *lexer) feed(r rune, char int) {
 		l.extendToken(r)
 		return // otherwise drop out of raw mode
 	}
-	if l.shouldRaw() && !l.isCurrent(tokenNewline) {
+	if l.shouldRaw() && !l.isCurrent(tokenNewline) && !l.isCurrent(tokenPipe) {
 		l.doRaw(r, char)
 		return
 	}

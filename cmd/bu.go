@@ -26,7 +26,6 @@ func main() {
 	  showVersion()
 		return
 	}
-  toylog.Infoln(*targetArgs)
   toylog.Infof(versionInfo + ", loading %q", *bufile)
   s := bu.NewScript(*bufile, *targetArgs)
 	t := s.Target(*targetName)

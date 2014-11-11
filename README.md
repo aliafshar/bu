@@ -1,16 +1,9 @@
-
-# 𝄽 bu
+% 𝄽 bu
+% author(s) (separated by semicolons)
+% date
 
 Bu is a tool to help you run common tasks. It is something like a simple version
-of make. You define a set of tasks and it will run them.
-
-- [Targets](#targets)
-  - [Target types](#target-types)
-  - [Indentation](#indentation)
-- [Variables](#variables)
-- [Questions](#questions)
-- [Imports](#imports)
-- [Comments](#comments)
+of make with additional features. You define a set of tasks and it will run them.
 
 Here is a tiny example.
 

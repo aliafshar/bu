@@ -9,7 +9,7 @@ type parser struct {
 	module *module
 	stack  []*token
 	line   int
-	target target
+  node  lined
 }
 
 func parseError(msg string, t *token) {
@@ -36,10 +36,10 @@ func (p *parser) handleRaw(ts []*token) {
 		// Trailing whitespace.
 		return
 	}
-	if p.target == nil {
+	if p.node == nil {
 		parseError("Target body outside target.", ts[1])
 	} else {
-		p.target.AppendBody(ts[1].value())
+		p.node.AppendBody(ts[1].value())
 	}
 }
 
@@ -62,25 +62,29 @@ func (p *parser) handleTarget(ts []*token) {
 			finishedDeps = true
 		}
 	}
-	p.target = tg
+	p.node = tg
 }
 
 func (p *parser) handleQuestion(ts []*token) {
 	tg := &questionTarget{name: string(ts[0].val), bodyLines: []string{}}
+	p.module.targets = append(p.module.targets, tg)
 	if len(ts) > 2 {
 		tg.dflt = strings.Trim(ts[2].value(), " ")
 	}
-	p.target = tg
-	p.module.targets = append(p.module.targets, p.target)
+	p.node = tg
 }
 
 func (p *parser) handleSetvar(ts []*token) {
-	val := ""
-	if len(ts) > 2 {
-		val = ts[2].value()
-    // val = strings.TrimLeft(ts[2].value(), " ")
-	}
-	p.module.setvars = append(p.module.setvars, &setvar{key: ts[0].value(), value: val})
+  tg := &setvar{key: ts[0].value()}
+  p.module.setvars = append(p.module.setvars, tg)
+  if len(ts) < 3 {
+    return
+  }
+  if ts[2].typ == tokenRaw {
+    tg.AppendBody(ts[2].value())
+    return
+  }
+  p.node = tg
 }
 
 func (p *parser) handleNamed(ts []*token) {

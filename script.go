@@ -29,6 +29,10 @@ type target interface {
 	Finalize(*script)
 }
 
+type lined interface {
+  AppendBody(string)
+}
+
 type questionTarget struct {
 	name      string
 	dflt      string
@@ -89,7 +93,15 @@ func (t *shellTarget) Finalize(s *script) {
 
 type setvar struct {
 	key   string
-	value string
+	bodyLines []string
+}
+
+func (t *setvar) AppendBody(s string) {
+	t.bodyLines = append(t.bodyLines, s)
+}
+
+func (t *setvar) value() string {
+  return trimJoinBody(t.bodyLines)
 }
 
 type script struct {
