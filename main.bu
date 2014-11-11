@@ -1,10 +1,15 @@
 # Bu file for bu itself
 
-run:
-  go run cmd/bu.go
+site_pages =index
+pandoc =eval ~/.cabal/bin/pandoc
+template =site/template.html
 
-MYVAR = othervalue fanana
+site:
+  cp README.md site/index.md
+  for p in $site_pages; do
+    echo  site/${p}.md
+    $pandoc --template=$template -i site/${p}.md -o site/${p}.html
+  done
 
-imported_test:
-  echo Import!
-  echo imported variable $MYVAR
+site_serve: site
+  twistd -n web --path=site

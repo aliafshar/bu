@@ -78,6 +78,7 @@ func (p *parser) handleSetvar(ts []*token) {
 	val := ""
 	if len(ts) > 2 {
 		val = ts[2].value()
+    // val = strings.TrimLeft(ts[2].value(), " ")
 	}
 	p.module.setvars = append(p.module.setvars, &setvar{key: ts[0].value(), value: val})
 }

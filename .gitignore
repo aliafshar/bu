@@ -22,3 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+site/node_modules
+site/.sass-cache
+site/dist

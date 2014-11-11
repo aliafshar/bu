@@ -153,6 +153,7 @@ func (t *questionTarget) Run() {
 func Run(s *script, t target) {
 	q := newTargetQueue(t)
 	for _, setvar := range s.setvars {
+    toylog.Errorf("%q %q", setvar.key, setvar.value)
 		os.Setenv(setvar.key, setvar.value)
 	}
 	p := &pool{Size: 4}
