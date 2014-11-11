@@ -64,6 +64,24 @@ where they can be used directly in targets as `$myvariable` in shell, or
 Note: Because variables are injected only into the environment, they will not be
 used in target names and dependencies.
 
+## Positional arguments 
+
+`$0`, `$1`, etc (in shell) and `sys.args` (in Python) are available as
+additional arguments passed to the bu invocation. Consider this target:
+
+    listargs:
+        echo Hi, "$0"
+
+and this invocation:
+
+    bu listargs Ali
+
+with this output:
+
+    I: > [listvars] sh:"echo Hi, \"$0\""
+    Hi, Ali
+    I: < [listvars] success
+
 ## Questions
 
     confirm ? n

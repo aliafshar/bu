@@ -12,5 +12,4 @@ site:
   done
 
 site_serve: site
-  echo "$0"
-  # twistd -n web --path=site
+  twistd -n web --path=site
