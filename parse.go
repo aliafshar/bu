@@ -138,6 +138,9 @@ func (p *parser) feed(t *token) {
 }
 
 func trimJoinBody(lines []string) string {
+  if len(lines) == 0 {
+    return ""
+  }
 	i := 0
 	found := false
 	for !found {

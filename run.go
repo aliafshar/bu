@@ -126,6 +126,9 @@ func (w *worker) runTarget(t target) {
 }
 
 func (t *shellTarget) Run() {
+  if t.body == "" {
+	  toylog.Infof("> [%v] Nothing to run.")
+  }
 	toylog.Infof("> [%v] %v:%#v", t.Name(), t.typ, t.body)
 	shell := runners[t.typ]
   args := append([]string{"-c", t.body, t.Name()}, t.args...)
