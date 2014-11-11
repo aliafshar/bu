@@ -46,7 +46,7 @@ be consistent for Python scripts since Python is sensitive to this.
 ## Variables
 
 
-Single line variables are defined with the `=` operator
+Single line variables are defined with the `=` operator, loke so:
 
     myvariable =I am the variable content
 
