@@ -128,7 +128,8 @@ func (w *worker) runTarget(t target) {
 func (t *shellTarget) Run() {
 	toylog.Infof("> [%v] %v:%#v", t.Name(), t.typ, t.body)
 	shell := runners[t.typ]
-	cmd := exec.Command(shell, "-c", t.body)
+  args := append([]string{"-c", t.body}, t.args...)
+	cmd := exec.Command(shell, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
@@ -153,7 +154,6 @@ func (t *questionTarget) Run() {
 func Run(s *script, t target) {
 	q := newTargetQueue(t)
 	for _, setvar := range s.setvars {
-    toylog.Errorf("%q %q", setvar.key, setvar.value)
 		os.Setenv(setvar.key, setvar.value)
 	}
 	p := &pool{Size: 4}

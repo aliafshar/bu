@@ -9,9 +9,10 @@ import (
 
 var (
 	app        = kingpin.New("bu", "A build utility.")
-	bufile     = app.Flag("bufile", "Path to bu file.").Default("main.bu").Short('f').String()
+	bufile     = app.Flag("bufile", "Path to bu file.").Default("main.bu").Short('f').ExistingFile()
 	version    = app.Flag("version", "Print the bu version and exit.").Short('v').Bool()
 	targetName = app.Arg("target", "Execute the named target.").String()
+  targetArgs = app.Arg("args", "Arguments to pass to the bu target.").Strings()
   versionInfo = "bu, version " + bu.BuVersion
 )
 
@@ -25,13 +26,9 @@ func main() {
 	  showVersion()
 		return
 	}
+  toylog.Infoln(*targetArgs)
   toylog.Infof(versionInfo + ", loading %q", *bufile)
-	//s, err := bu.Load(*bufile)
-	//if err != nil {
-	//	toylog.Fatalf("failed to load bu file (%v)", err)
-	//}
-	//t := s.Target(*targetName)
-  s := bu.NewScript(*bufile)
+  s := bu.NewScript(*bufile, *targetArgs)
 	t := s.Target(*targetName)
 	if t == nil {
 		toylog.Fatalf("target not found %q", *targetName)

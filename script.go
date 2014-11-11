@@ -59,6 +59,7 @@ type shellTarget struct {
 	depsNames []string
 	deps      []target
 	typ       string
+  args      []string
 }
 
 func (t *shellTarget) Name() string {
@@ -75,6 +76,7 @@ func (t *shellTarget) AppendBody(s string) {
 
 func (t *shellTarget) Finalize(s *script) {
 	t.body = trimJoinBody(t.bodyLines)
+  t.args = s.args
 	for _, dn := range t.depsNames {
 		if d := s.Target(dn); d != nil {
 			t.deps = append(t.deps, d)
@@ -94,6 +96,7 @@ type script struct {
 	modules []*module
 	setvars []*setvar
 	path    []string
+  args    []string
 }
 
 func (s *script) Target(name string) target {
@@ -163,8 +166,8 @@ func (s *script) resolveModule(name string) string {
 	return ""
 }
 
-func NewScript(filename string) *script {
-	s := &script{modules: []*module{}, setvars: []*setvar{}, path: defaultPath()}
+func NewScript(filename string, args []string) *script {
+  s := &script{path: defaultPath(), args: args}
 	s.loadModule(filename)
 	s.finalize()
 	return s
