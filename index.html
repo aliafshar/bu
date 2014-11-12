@@ -90,7 +90,8 @@ td.sourceCode { padding-left: 5px; }
 
 <p>Bu is a tool to help you run common tasks. It is something like a simple version of GNU make with some additional features. You define a set of tasks and it will run them. It features: <strong>targets with dependencies</strong>, <strong>script imports</strong>, <strong>using Bash or Python</strong>, <strong>task parallelism</strong>, <strong>command line inputs</strong>, and <strong>variables</strong>.</p>
 <p>Here is a tiny example.</p>
-<p>run: echo I run something.</p>
+<pre><code>run:
+    echo I run something.</code></pre>
 <p>The target is executed with:</p>
 <pre><code>$ bu run</code></pre>
 <p>And we get the following output:</p>
@@ -101,7 +102,8 @@ I: &gt; I run something.</code></pre>
 <pre><code>&lt;target name&gt;: [dependencies...] [!type] 
     &lt;script body&gt;</code></pre>
 <p>for example,</p>
-<p>run: build go run cmd/bu.go</p>
+<pre><code>run: build
+    go run cmd/bu.go</code></pre>
 <p>is a target named <code>run</code> that depends on a target named <code>build</code> that runs the shell command <code>go run cmd/bu.go</code>.</p>
 <h3 id="target-types">Target types</h3>
 <p>Currently only shell and python are supported. Shell is the default, so no type is required to be passed explicitly. For a Python target, add the type.</p>
