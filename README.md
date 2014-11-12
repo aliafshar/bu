@@ -10,8 +10,8 @@ and **variables**.
 Here is a tiny example.
 
 
-run:
-    echo I run something.
+    run:
+        echo I run something.
 
 The target is executed with:
 
@@ -30,8 +30,8 @@ And we get the following output:
 
 for example,
 
-run: build
-    go run cmd/bu.go
+    run: build
+        go run cmd/bu.go
 
 is a target named `run` that depends on a target named `build` that runs the
 shell command `go run cmd/bu.go`.
