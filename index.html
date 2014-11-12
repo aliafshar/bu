@@ -56,11 +56,13 @@
 
 <main>
 
-<p>Bu is a tool to help you run common tasks. It is something like a simple version of make with additional features. You define a set of tasks and it will run them.</p>
+<p>Bu is a tool to help you run common tasks. It is something like a simple version of GNU make with some additional features. You define a set of tasks and it will run them.</p>
 <p>Here is a tiny example.</p>
 <pre><code>run:
     echo I run something.</code></pre>
-<p>When running <code>bu run</code>,</p>
+<p>The target is executed with:</p>
+<pre><code>$ bu run</code></pre>
+<p>And we get the following output:</p>
 <pre><code>I: bu, version 0.0, loading &quot;Bufile&quot;
 I: &lt; &quot;echo I run something.&quot;. [worker:0]
 I: &gt; I run something.</code></pre>
@@ -79,7 +81,7 @@ I: &gt; I run something.</code></pre>
 <h3 id="indentation">Indentation</h3>
 <p>Target bodies must be indented by any whitespace, tab or space. Indentation must be consistent for Python scripts since Python is sensitive to this.</p>
 <h2 id="variables">Variables</h2>
-<p>Single line variables are defined with the <code>=</code> operator, loke so:</p>
+<p>Single line variables are defined with the <code>=</code> operator, like so:</p>
 <pre><code>myvariable =I am the variable content</code></pre>
 <p>Multiline variables are defined with the <code>=|</code> operator followed by a block.</p>
 <pre><code>myvariable =|
