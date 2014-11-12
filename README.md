@@ -1,16 +1,27 @@
-% 𝄽 bu
-% author(s) (separated by semicolons)
-% date
+% Introduction
+% afshar@google.com
 
 Bu is a tool to help you run common tasks. It is something like a simple version
-of make with additional features. You define a set of tasks and it will run them.
+of GNU make with some additional features. You define a set of tasks and it will run them.
+
+Features:
+
+* Targets with dependencies 
+* Use Bash or Python
+* Parallelism
+* Command line input
+* Variables
 
 Here is a tiny example.
 
     run:
         echo I run something.
 
-When running `bu run`,
+The target is executed with:
+
+    $ bu run
+
+And we get the following output:
 
     I: bu, version 0.0, loading "Bufile"
     I: < "echo I run something.". [worker:0]
@@ -45,7 +56,8 @@ be consistent for Python scripts since Python is sensitive to this.
 
 ## Variables
 
-Single line variables are defined with the `=` operator
+
+Single line variables are defined with the `=` operator, like so:
 
     myvariable =I am the variable content
 

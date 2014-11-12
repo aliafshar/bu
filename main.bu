@@ -1,15 +1,31 @@
 # Bu file for bu itself
 
 site_pages =index
-pandoc =eval ~/.cabal/bin/pandoc
-template =site/template.html
+pandoc     =eval ~/.cabal/bin/pandoc
+template   =site/template.html
+repo       =https://github.com/aliafshar/bu.git
 
-site:
+site_build:
   cp README.md site/index.md
   for p in $site_pages; do
     echo  site/${p}.md
-    $pandoc --template=$template -i site/${p}.md -o site/${p}.html
+  $pandoc --template=$template -i site/${p}.md -o site/${p}.html
   done
 
-site_serve: site
+site_serve:
   twistd -n web --path=site
+
+site_dev: site_build site_serve
+
+site_push: site_build
+  cd site
+  git add .
+  git commit -m "Updated docs."
+  git push origin gh-pages
+
+site_clone:
+  git clone -b gh-pages $repo site
+
+fmt:
+  gofmt -w *.go */*.go
+

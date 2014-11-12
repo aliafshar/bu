@@ -23,6 +23,4 @@ _testmain.go
 *.test
 *.prof
 
-site/node_modules
-site/.sass-cache
-site/dist
+site/

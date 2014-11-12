@@ -14,85 +14,8 @@ type module struct {
 	imports     []string
 }
 
-func (s *module) Target(name string) target {
-	if name == "" {
-		return s.targets[0]
-	}
-	return s.targetIndex[name]
-}
-
-type target interface {
-	Name() string
-	Deps() []target
-	AppendBody(string)
-	Run()
-	Finalize(*script)
-}
-
-type lined interface {
-  AppendBody(string)
-}
-
-type questionTarget struct {
-	name      string
-	dflt      string
-	usage     string
-	bodyLines []string
-}
-
-func (t *questionTarget) Name() string {
-	return t.name
-}
-
-func (t *questionTarget) Deps() []target {
-	return nil
-}
-
-func (t *questionTarget) Finalize(s *script) {
-	t.usage = trimJoinBody(t.bodyLines)
-}
-
-func (t *questionTarget) AppendBody(s string) {
-	t.bodyLines = append(t.bodyLines, s)
-}
-
-type shellTarget struct {
-	name      string
-	body      string
-	bodyLines []string
-	depsNames []string
-	deps      []target
-	typ       string
-  args      []string
-}
-
-func (t *shellTarget) Name() string {
-	return t.name
-}
-
-func (t *shellTarget) Deps() []target {
-	return t.deps
-}
-
-func (t *shellTarget) AppendBody(s string) {
-	t.bodyLines = append(t.bodyLines, s)
-}
-
-func (t *shellTarget) Finalize(s *script) {
-	t.body = trimJoinBody(t.bodyLines)
-  t.args = s.args
-	for _, dn := range t.depsNames {
-		if d := s.Target(dn); d != nil {
-			t.deps = append(t.deps, d)
-		} else {
-			toylog.Errorf("Missing dependency %q in %q.", dn, t.name)
-			return
-		}
-	}
-}
-
 type setvar struct {
-	key   string
+	key       string
 	bodyLines []string
 }
 
@@ -101,23 +24,19 @@ func (t *setvar) AppendBody(s string) {
 }
 
 func (t *setvar) value() string {
-  return trimJoinBody(t.bodyLines)
+	return trimJoinBody(t.bodyLines)
 }
 
 type script struct {
 	modules []*module
 	setvars []*setvar
 	path    []string
-  args    []string
+	args    []string
+	targets map[string]target
 }
 
 func (s *script) Target(name string) target {
-	for _, m := range s.modules {
-		if t, ok := m.targetIndex[name]; ok {
-			return t
-		}
-	}
-	return nil
+	return s.targets[name]
 }
 
 func homeFilename(filename string) (string, error) {
@@ -142,8 +61,11 @@ func (s *script) finalize() {
 	for _, m := range mro {
 		s.setvars = append(s.setvars, m.setvars...)
 		for _, t := range m.targets {
-			t.Finalize(s)
+			s.targets[t.Name()] = t
 		}
+	}
+	for _, t := range s.targets {
+		t.Finalize(s)
 	}
 }
 
@@ -179,7 +101,7 @@ func (s *script) resolveModule(name string) string {
 }
 
 func NewScript(filename string, args []string) *script {
-  s := &script{path: defaultPath(), args: args}
+	s := &script{path: defaultPath(), args: args, targets: make(map[string]target)}
 	s.loadModule(filename)
 	s.finalize()
 	return s

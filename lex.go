@@ -28,7 +28,7 @@ const (
 	tokenComment    tokenType = "COMMENT"
 	tokenLessthan   tokenType = "LESSTHAN"
 	tokenQuestion   tokenType = "QUESTION"
-  tokenPipe tokenType = "PIPE"
+	tokenPipe       tokenType = "PIPE"
 	eof                       = 4
 	lf                        = 10
 )
@@ -43,7 +43,7 @@ var keywords = map[string]tokenType{
 	"#":  tokenComment,
 	"<":  tokenLessthan,
 	"?":  tokenQuestion,
-  "|":  tokenPipe,
+	"|":  tokenPipe,
 }
 
 type token struct {

@@ -1,19 +1,18 @@
 package bu
 
 import (
-	"github.com/aliafshar/toylog"
 	"strings"
 )
+
+type block interface {
+	AppendBody(string)
+}
 
 type parser struct {
 	module *module
 	stack  []*token
 	line   int
-  node  lined
-}
-
-func parseError(msg string, t *token) {
-	toylog.Errorf("Error parsing. "+msg+" [line %v %q]", t.line, t.value())
+	node   block
 }
 
 func newParser() *parser {
@@ -75,16 +74,16 @@ func (p *parser) handleQuestion(ts []*token) {
 }
 
 func (p *parser) handleSetvar(ts []*token) {
-  tg := &setvar{key: ts[0].value()}
-  p.module.setvars = append(p.module.setvars, tg)
-  if len(ts) < 3 {
-    return
-  }
-  if ts[2].typ == tokenRaw {
-    tg.AppendBody(ts[2].value())
-    return
-  }
-  p.node = tg
+	tg := &setvar{key: ts[0].value()}
+	p.module.setvars = append(p.module.setvars, tg)
+	if len(ts) < 3 {
+		return
+	}
+	if ts[2].typ == tokenRaw {
+		tg.AppendBody(ts[2].value())
+		return
+	}
+	p.node = tg
 }
 
 func (p *parser) handleNamed(ts []*token) {
@@ -138,9 +137,9 @@ func (p *parser) feed(t *token) {
 }
 
 func trimJoinBody(lines []string) string {
-  if len(lines) == 0 {
-    return ""
-  }
+	if len(lines) == 0 {
+		return ""
+	}
 	i := 0
 	found := false
 	for !found {
