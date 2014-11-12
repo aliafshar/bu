@@ -9,7 +9,7 @@ site_build:
   cp README.md site/index.md
   for p in $site_pages; do
     echo  site/${p}.md
-  $pandoc --template=$template -i site/${p}.md -o site/${p}.html
+  $pandoc -s --template=$template -f markdown -i site/${p}.md -o site/${p}.html
   done
 
 site_serve:

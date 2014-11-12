@@ -2,20 +2,16 @@
 % afshar@google.com
 
 Bu is a tool to help you run common tasks. It is something like a simple version
-of GNU make with some additional features. You define a set of tasks and it will run them.
-
-Features:
-
-* Targets with dependencies 
-* Use Bash or Python
-* Parallelism
-* Command line input
-* Variables
+of GNU make with some additional features. You define a set of tasks and it will
+run them. It features: **targets with dependencies**, **script imports**,
+**using Bash or Python**, **task parallelism**, **command line inputs**,
+and **variables**.
 
 Here is a tiny example.
 
-    run:
-        echo I run something.
+
+run:
+    echo I run something.
 
 The target is executed with:
 
@@ -34,8 +30,8 @@ And we get the following output:
 
 for example,
 
-    run: build
-        go run cmd/bu.go
+run: build
+    go run cmd/bu.go
 
 is a target named `run` that depends on a target named `build` that runs the
 shell command `go run cmd/bu.go`.
@@ -59,15 +55,15 @@ be consistent for Python scripts since Python is sensitive to this.
 
 Single line variables are defined with the `=` operator, like so:
 
-    myvariable =I am the variable content
+myvariable =I am the variable content
 
 Multiline variables are defined with the `=|` operator followed by a block.
 
-    myvariable =|
-        I
-        am
-        the variable
-        content
+myvariable =|
+    I
+    am
+    the variable
+    content
 
 Defines a variable `myvariable`. Quoting is not required as the variable value
 is taken to the end of the line.
@@ -130,3 +126,8 @@ Line comments only. Non-line comments are undefined, especially in situations
 where values are taken to the end of a line, e.g. variable definitions
 
     myvariable = I am the value # this comment will be part of the value
+
+## Differenced from GNU make
+
+* Each target is executed in the same shell
+* File existence is not explicitly taken to imply a dependency satisfaction
