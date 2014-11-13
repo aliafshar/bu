@@ -1,6 +1,3 @@
-% Introduction
-% afshar@google.com
-
 Bu is a tool to help you run common tasks. It is something like a simple version
 of GNU make with some additional features. You define a set of tasks and it will
 run them. It features: **targets with dependencies**, **script imports**,
@@ -9,9 +6,18 @@ and **variables**.
 
 Here is a tiny example.
 
+```bu
+demo:
+  echo Hello, world!
+```
+Output:
 
-    run:
-        echo I run something.
+```bu-out
+I: bu, version 0.0, loading "/tmp/tmpUeb4jK"
+I: > [demo] sh:"echo Hello, world!"
+Hello, world!
+I: < [demo] success
+```
 
 The target is executed with:
 
@@ -30,8 +36,24 @@ And we get the following output:
 
 for example,
 
-    run: build
-        go run cmd/bu.go
+```bu
+demo: build
+  echo Hello, world!
+
+build:
+  echo a dependency
+```
+Output:
+
+```bu-out
+I: bu, version 0.0, loading "/tmp/tmpkDCH_Y"
+I: > [build] sh:"echo a dependency"
+a dependency
+I: < [build] success
+I: > [demo] sh:"echo Hello, world!"
+Hello, world!
+I: < [demo] success
+```
 
 is a target named `run` that depends on a target named `build` that runs the
 shell command `go run cmd/bu.go`.

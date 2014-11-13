@@ -77,21 +77,28 @@ td.sourceCode { padding-left: 5px; }
 
 <main>
 
+<!--
 <nav class="breadcrumbs">
   <p>
   <a class="breadcrumbs__link" href="/">bu</a> /
-  <a class="breadcrumbs__link" href="#">Introduction</a>
+  <a class="breadcrumbs__link" href="#"></a>
   </p>
 </nav>
+-->
 
-<h1>Introduction</h1>
+
 
 
 
 <p>Bu is a tool to help you run common tasks. It is something like a simple version of GNU make with some additional features. You define a set of tasks and it will run them. It features: <strong>targets with dependencies</strong>, <strong>script imports</strong>, <strong>using Bash or Python</strong>, <strong>task parallelism</strong>, <strong>command line inputs</strong>, and <strong>variables</strong>.</p>
 <p>Here is a tiny example.</p>
-<pre><code>run:
-    echo I run something.</code></pre>
+<pre class="bu"><code>demo:
+  echo Hello, world!</code></pre>
+<p>Output:</p>
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpUeb4jK&quot;
+I: &gt; [demo] sh:&quot;echo Hello, world!&quot;
+Hello, world!
+I: &lt; [demo] success</code></pre>
 <p>The target is executed with:</p>
 <pre><code>$ bu run</code></pre>
 <p>And we get the following output:</p>
@@ -102,8 +109,19 @@ I: &gt; I run something.</code></pre>
 <pre><code>&lt;target name&gt;: [dependencies...] [!type] 
     &lt;script body&gt;</code></pre>
 <p>for example,</p>
-<pre><code>run: build
-    go run cmd/bu.go</code></pre>
+<pre class="bu"><code>demo: build
+  echo Hello, world!
+
+build:
+  echo a dependency</code></pre>
+<p>Output:</p>
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpkDCH_Y&quot;
+I: &gt; [build] sh:&quot;echo a dependency&quot;
+a dependency
+I: &lt; [build] success
+I: &gt; [demo] sh:&quot;echo Hello, world!&quot;
+Hello, world!
+I: &lt; [demo] success</code></pre>
 <p>is a target named <code>run</code> that depends on a target named <code>build</code> that runs the shell command <code>go run cmd/bu.go</code>.</p>
 <h3 id="target-types">Target types</h3>
 <p>Currently only shell and python are supported. Shell is the default, so no type is required to be passed explicitly. For a Python target, add the type.</p>
