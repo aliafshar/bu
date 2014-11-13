@@ -48,6 +48,22 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.fu { color: #06287e; }
 .sourceCode span.re { }
 .sourceCode span.er { color: red; font-weight: bold; }
+
+pre {
+  background-color: #404040;
+    position: relative;
+  color: #f0f0f0;
+}
+
+
+pre .code-input {
+  position: absolute;
+  color: #909090;
+  top: 0;
+    right: 6px;
+font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
+  }
+
     </style>
   </head>
   <body>
@@ -74,6 +90,7 @@ td.sourceCode { padding-left: 5px; }
       
       </ul>
     </nav>
+
 
 <main>
 
@@ -108,5 +125,23 @@ $body$
       ga('send', 'pageview');
     </script>
     <!-- Built with love using Web Starter Kit -->
+    <script>
+      var texts = {
+        "bu": "𝄽 bu input",
+        "bu-out": "𝄽 bu output",
+      };
+      function inject(cls) {
+        var snips = document.getElementsByClassName(cls);
+        for (var i = 0; i < snips.length; i++) {
+          var e = snips.item(i);
+          var c = document.createElement("span");
+          c.className = "code-input";
+          c.innerText = texts[cls];
+          e.appendChild(c);
+        }
+      }
+      inject("bu");
+      inject("bu-out");
+    </script>
   </body>
 </html>
