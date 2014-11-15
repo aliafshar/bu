@@ -1,6 +1,3 @@
-% Introduction
-% afshar@google.com
-
 Bu is a tool to help you run common tasks. It is something like a simple version
 of GNU make with some additional features. You define a set of tasks and it will
 run them. It features: **targets with dependencies**, **script imports**,
@@ -9,29 +6,31 @@ and **variables**.
 
 Here is a tiny example.
 
-
-    run:
-        echo I run something.
+```bu
+demo:
+  echo Hello, world!
+```
 
 The target is executed with:
 
-    $ bu run
+    $ bu demo
 
-And we get the following output:
+# Targets
 
-    I: bu, version 0.0, loading "Bufile"
-    I: < "echo I run something.". [worker:0]
-    I: > I run something.
-
-## Targets
-
-    <target name>: [dependencies...] [!type] 
-        <script body>
+```bu-spec
+<target name>: [dependencies...] [!type] 
+  <script body>
+```
 
 for example,
 
-    run: build
-        go run cmd/bu.go
+```bu
+demo: build
+  echo Hello, world!
+
+build:
+  echo a dependency
+```
 
 is a target named `run` that depends on a target named `build` that runs the
 shell command `go run cmd/bu.go`.
@@ -41,9 +40,11 @@ shell command `go run cmd/bu.go`.
 Currently only shell and python are supported. Shell is the default, so no type
 is required to be passed explicitly. For a Python target, add the type.
 
-    run: !py
-        for i in range(5):
-            print i
+```bu
+demo: !py
+  for i in range(5):
+    print i
+```
 
 ### Indentation
 
@@ -55,15 +56,25 @@ be consistent for Python scripts since Python is sensitive to this.
 
 Single line variables are defined with the `=` operator, like so:
 
-myvariable =I am the variable content
+```bu
+DEMO =I am the variable content
+
+demo:
+  echo $DEMO
+```
 
 Multiline variables are defined with the `=|` operator followed by a block.
 
-myvariable =|
+```bu
+DEMO =|
     I
     am
     the variable
     content
+
+demo:
+  echo "$DEMO"
+```
 
 Defines a variable `myvariable`. Quoting is not required as the variable value
 is taken to the end of the line.
@@ -77,34 +88,33 @@ used in target names and dependencies.
 
 ## Positional arguments 
 
-`$0`, `$1`, etc (in shell) and `sys.args` (in Python) are available as
+`$0`, `$1`, `$*`, `$@` etc (in shell) and `sys.args` (in Python) are available as
 additional arguments passed to the bu invocation. Consider this target:
 
-    listargs:
-        echo Hi, "$0"
+```bu
+demo:
+  echo Hi, "$0"
+```
 
 and this invocation:
 
-    bu listargs Ali
-
-with this output:
-
-    I: > [listvars] sh:"echo Hi, \"$0\""
-    Hi, Ali
-    I: < [listvars] success
+    $ bu demo FirstArgument
 
 ## Questions
 
-    confirm ? n
-        Are you sure? (y/n)
+```bu
+demo ? n
+  Are you sure? (y/n)
+
+danger: demo
+  if [ $demo -eq y ]; then
+    echo Confirmed, continuing
+  fi
+```
 
 Will prompt the user on the command line and store the value in the variable
 `confirm` with a default value of `n`. Questions are targets and can be depended
 on by other targets.
-
-    danger: confirm
-      if [ $confirm -eq y ]; then
-      ...
 
 Default values are optional, with the syntax:
 

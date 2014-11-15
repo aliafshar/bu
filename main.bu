@@ -33,18 +33,18 @@ docs_samples: !py
   def lines():
       f = open("README.md")
       o = False
+      buf = ['']
       for l in f:
           line = l.rstrip('\n')
           yield line
-          if line.startswith('```bu'):
+          if line.startswith('```bu') and not line.startswith('```bu-'):
               o = True
               buf = ['']
-          elif line.startswith('```'):
+          elif line.startswith('```') and o:
               o = False
               f = tempfile.NamedTemporaryFile(delete=False)
               f.write('\n'.join(buf + ['']))
               f.close()
-              yield 'Output:'
               yield ''
               yield '```bu-out'
               out = subprocess.check_output(["bu", "-f", f.name, "demo"], stderr=subprocess.STDOUT)
