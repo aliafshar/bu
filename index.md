@@ -12,7 +12,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpbgUyzZ"
+I: bu, version 0.0, loading "/tmp/tmpV9BBSE"
 I: > [demo] sh:"echo Hello, world!"
 Hello, world!
 I: < [demo] success
@@ -20,18 +20,14 @@ I: < [demo] success
 
 The target is executed with:
 
-    $ bu run
+    $ bu demo
 
-And we get the following output:
+# Targets
 
-    I: bu, version 0.0, loading "Bufile"
-    I: < "echo I run something.". [worker:0]
-    I: > I run something.
-
-## Targets
-
-    <target name>: [dependencies...] [!type] 
-        <script body>
+```bu-spec
+<target name>: [dependencies...] [!type] 
+  <script body>
+```
 
 for example,
 
@@ -44,7 +40,7 @@ build:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpwGotJS"
+I: bu, version 0.0, loading "/tmp/tmpBhTXqL"
 I: > [build] sh:"echo a dependency"
 a dependency
 I: < [build] success
@@ -68,7 +64,7 @@ demo: !py
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpXCjuMF"
+I: bu, version 0.0, loading "/tmp/tmpiQ5YN5"
 I: > [demo] py:"for i in range(5):\n  print i"
 0
 1
@@ -96,7 +92,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmp5_JGHe"
+I: bu, version 0.0, loading "/tmp/tmpW__iJw"
 I: > [demo] sh:"echo $DEMO"
 I am the variable content
 I: < [demo] success
@@ -116,7 +112,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpOB4Ttn"
+I: bu, version 0.0, loading "/tmp/tmpJfqmm3"
 I: > [demo] sh:"echo \"$DEMO\""
 I
 am
@@ -137,7 +133,7 @@ used in target names and dependencies.
 
 ## Positional arguments 
 
-`$0`, `$1`, etc (in shell) and `sys.args` (in Python) are available as
+`$0`, `$1`, `$*`, `$@` etc (in shell) and `sys.args` (in Python) are available as
 additional arguments passed to the bu invocation. Consider this target:
 
 ```bu
@@ -146,7 +142,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpmDTwM6"
+I: bu, version 0.0, loading "/tmp/tmpbYntO5"
 I: > [demo] sh:"echo Hi, \"$0\""
 Hi, demo
 I: < [demo] success
@@ -169,7 +165,7 @@ danger: demo
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpYqEg7U"
+I: bu, version 0.0, loading "/tmp/tmpk9ruZt"
 I: > [demo] question: "Are you sure? (y/n)"
 [1mAre you sure? (y/n)[0m (default=[1m[34mn[0m[0m) > E: < [demo] failure, EOF
 I: < [demo] success $demo=""

@@ -50,9 +50,7 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.er { color: red; font-weight: bold; }
 
 pre {
-  background-color: #404040;
     position: relative;
-  color: #f0f0f0;
 }
 
 
@@ -127,8 +125,9 @@ $body$
     <!-- Built with love using Web Starter Kit -->
     <script>
       var texts = {
-        "bu": "𝄽 bu input",
-        "bu-out": "𝄽 bu output",
+        "bu": "input for 𝄽 bu demo",
+        "bu-out": "output of 𝄽 bu demo",
+        "bu-spec": "𝄽 bu spec"
       };
       function inject(cls) {
         var snips = document.getElementsByClassName(cls);
@@ -142,6 +141,7 @@ $body$
       }
       inject("bu");
       inject("bu-out");
+      inject("bu-spec");
     </script>
   </body>
 </html>

@@ -50,9 +50,7 @@ td.sourceCode { padding-left: 5px; }
 .sourceCode span.er { color: red; font-weight: bold; }
 
 pre {
-  background-color: #404040;
     position: relative;
-  color: #f0f0f0;
 }
 
 
@@ -111,26 +109,22 @@ font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
 <p>Here is a tiny example.</p>
 <pre class="bu"><code>demo:
   echo Hello, world!</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpbgUyzZ&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpV9BBSE&quot;
 I: &gt; [demo] sh:&quot;echo Hello, world!&quot;
 Hello, world!
 I: &lt; [demo] success</code></pre>
 <p>The target is executed with:</p>
-<pre><code>$ bu run</code></pre>
-<p>And we get the following output:</p>
-<pre><code>I: bu, version 0.0, loading &quot;Bufile&quot;
-I: &lt; &quot;echo I run something.&quot;. [worker:0]
-I: &gt; I run something.</code></pre>
-<h2 id="targets">Targets</h2>
-<pre><code>&lt;target name&gt;: [dependencies...] [!type] 
-    &lt;script body&gt;</code></pre>
+<pre><code>$ bu demo</code></pre>
+<h1 id="targets">Targets</h1>
+<pre class="bu-spec"><code>&lt;target name&gt;: [dependencies...] [!type] 
+  &lt;script body&gt;</code></pre>
 <p>for example,</p>
 <pre class="bu"><code>demo: build
   echo Hello, world!
 
 build:
   echo a dependency</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpwGotJS&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpBhTXqL&quot;
 I: &gt; [build] sh:&quot;echo a dependency&quot;
 a dependency
 I: &lt; [build] success
@@ -143,7 +137,7 @@ I: &lt; [demo] success</code></pre>
 <pre class="bu"><code>demo: !py
   for i in range(5):
     print i</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpXCjuMF&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpiQ5YN5&quot;
 I: &gt; [demo] py:&quot;for i in range(5):\n  print i&quot;
 0
 1
@@ -159,7 +153,7 @@ I: &lt; [demo] success</code></pre>
 
 demo:
   echo $DEMO</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp5_JGHe&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpW__iJw&quot;
 I: &gt; [demo] sh:&quot;echo $DEMO&quot;
 I am the variable content
 I: &lt; [demo] success</code></pre>
@@ -172,7 +166,7 @@ I: &lt; [demo] success</code></pre>
 
 demo:
   echo &quot;$DEMO&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpOB4Ttn&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpJfqmm3&quot;
 I: &gt; [demo] sh:&quot;echo \&quot;$DEMO\&quot;&quot;
 I
 am
@@ -183,10 +177,10 @@ I: &lt; [demo] success</code></pre>
 <p>Variables are injected into the environment, where they can be used directly in targets as <code>$myvariable</code> in shell, or <code>os.getenv('myvariable')</code> from Python.</p>
 <p>Note: Because variables are injected only into the environment, they will not be used in target names and dependencies.</p>
 <h2 id="positional-arguments">Positional arguments</h2>
-<p><code>$0</code>, <code>$1</code>, etc (in shell) and <code>sys.args</code> (in Python) are available as additional arguments passed to the bu invocation. Consider this target:</p>
+<p><code>$0</code>, <code>$1</code>, <code>$*</code>, <code>$@</code> etc (in shell) and <code>sys.args</code> (in Python) are available as additional arguments passed to the bu invocation. Consider this target:</p>
 <pre class="bu"><code>demo:
   echo Hi, &quot;$0&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpmDTwM6&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpbYntO5&quot;
 I: &gt; [demo] sh:&quot;echo Hi, \&quot;$0\&quot;&quot;
 Hi, demo
 I: &lt; [demo] success</code></pre>
@@ -200,7 +194,7 @@ danger: demo
   if [ $demo -eq y ]; then
     echo Confirmed, continuing
   fi</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpYqEg7U&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpk9ruZt&quot;
 I: &gt; [demo] question: &quot;Are you sure? (y/n)&quot;
 [1mAre you sure? (y/n)[0m (default=[1m[34mn[0m[0m) &gt; E: &lt; [demo] failure, EOF
 I: &lt; [demo] success $demo=&quot;&quot;</code></pre>
@@ -242,8 +236,9 @@ I: &lt; [demo] success $demo=&quot;&quot;</code></pre>
     <!-- Built with love using Web Starter Kit -->
     <script>
       var texts = {
-        "bu": "𝄽 bu input",
-        "bu-out": "𝄽 bu output",
+        "bu": "input for 𝄽 bu demo",
+        "bu-out": "output of 𝄽 bu demo",
+        "bu-spec": "𝄽 bu spec"
       };
       function inject(cls) {
         var snips = document.getElementsByClassName(cls);
@@ -257,6 +252,7 @@ I: &lt; [demo] success $demo=&quot;&quot;</code></pre>
       }
       inject("bu");
       inject("bu-out");
+      inject("bu-spec");
     </script>
   </body>
 </html>
