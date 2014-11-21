@@ -1,14 +1,11 @@
-
 package main
 
-import(
-  bu "github.com/aliafshar/bu/parse"
+import (
+	bu "github.com/aliafshar/bu/parse"
 	"github.com/aliafshar/toylog"
 	"gopkg.in/alecthomas/kingpin.v1"
 	"os"
 )
-
-
 
 var (
 	app         = kingpin.New("bu", "A build utility.")

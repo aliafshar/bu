@@ -14,7 +14,7 @@ type dependency interface {
 }
 
 type targetDependency struct {
-	name   string
+	name string
 }
 
 func (d *targetDependency) isDone(w *worker) bool {
@@ -45,7 +45,6 @@ type bash struct{}
 
 func execute(cmd string) {
 }
-
 
 type target2 interface {
 	Run() error

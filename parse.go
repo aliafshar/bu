@@ -30,7 +30,7 @@ func (p *parser) buildAst(r io.Reader) (*node, error) {
 	return b.root, nil
 }
 
-var targetBuilders = map[opType]func(*node) target {
+var targetBuilders = map[opType]func(*node) target{
 	opShell: func(n *node) target {
 		return &shellTarget{name: n.key, body: n.body()}
 	},
@@ -40,30 +40,30 @@ var targetBuilders = map[opType]func(*node) target {
 }
 
 func (p *parser) createShellTarget(n *node) target {
-		t := &shellTarget{name: n.key, body: n.body(), shell: "sh"}
-		for _, o := range n.nodes {
-			switch o.op {
-				case opUnnamed:
-					t.deps = append(t.deps, &targetDependency{name: o.key})
-					t.depsNames = append(t.depsNames, o.key)
-				case opShell:
-					t.shell = o.key
-			}
+	t := &shellTarget{name: n.key, body: n.body(), shell: "sh"}
+	for _, o := range n.nodes {
+		switch o.op {
+		case opUnnamed:
+			t.deps = append(t.deps, &targetDependency{name: o.key})
+			t.depsNames = append(t.depsNames, o.key)
+		case opShell:
+			t.shell = o.key
 		}
-		return t
+	}
+	return t
 }
 
 func (p *parser) createQuestionTarget(n *node) target {
 	t := &questionTarget{name: n.key, usage: n.body()}
-		for _, o := range n.nodes {
-			switch o.op {
-				case opUnnamed:
-					t.dflt = o.key
-					break
-			}
+	for _, o := range n.nodes {
+		switch o.op {
+		case opUnnamed:
+			t.dflt = o.key
+			break
 		}
+	}
 
-		return t
+	return t
 }
 
 func (p *parser) createTarget(m *module, n *node) error {
