@@ -15,16 +15,19 @@ type targetQueue struct {
 	sync.Mutex
 }
 
-func (q *targetQueue) build(t target) {
+func (q *targetQueue) build(s *script, t target) {
 	q.items = append(q.items, t)
-	for _, u := range t.Deps() {
-		q.build(u)
+	for _, d := range t.Deps() {
+		u := d.runnable(s)
+		if u != nil {
+			q.build(s, u)
+		}
 	}
 }
 
-func newTargetQueue(t target) *targetQueue {
+func newTargetQueue(s *script, t target) *targetQueue {
 	q := &targetQueue{items: []target{}, done: make(map[string]bool)}
-	q.build(t)
+	q.build(s, t)
 	return q
 }
 
@@ -62,19 +65,15 @@ func (q *targetQueue) markDone(t target) {
 	q.done[t.Name()] = true
 }
 
-func (q *targetQueue) hasDone(ts ...target) bool {
+func (q *targetQueue) hasDone(ts ...string) bool {
 	q.Lock()
 	defer q.Unlock()
 	for _, t := range ts {
-		if !q.done[t.Name()] {
+		if !q.done[t] {
 			return false
 		}
 	}
 	return true
-}
-
-func (q *targetQueue) canRun(t target) bool {
-	return q.hasDone(t.Deps()...)
 }
 
 type pool struct {
@@ -103,9 +102,9 @@ func (w *worker) run() {
 		if t == nil {
 			break
 		}
-		if w.q.canRun(t) {
+		if canRun(t, w) {
 			w.q.pop()
-			w.runTarget(t)
+			t.Run()
 			w.q.markDone(t)
 		} else {
 			w.q.rotate()
@@ -121,16 +120,12 @@ var runners = map[string]string{
 	"":   "bash",
 }
 
-func (w *worker) runTarget(t target) {
-	t.Run()
-}
-
 func (t *shellTarget) Run() {
 	if t.body == "" {
 		toylog.Infof("> [%v] Nothing to run.")
 	}
-	toylog.Infof("> [%v] %v:%#v", t.Name(), t.typ, t.body)
-	shell := runners[t.typ]
+	toylog.Infof("> [%v] %v:%#v", t.Name(), t, t.body)
+	shell := runners[t.shell]
 	args := append([]string{"-c", t.body, t.Name()}, t.args...)
 	cmd := exec.Command(shell, args...)
 	cmd.Stdout = os.Stdout
@@ -154,10 +149,19 @@ func (t *questionTarget) Run() {
 	toylog.Infof("< [%v] success $%v=%q", t.Name(), t.Name(), v)
 }
 
+func canRun(t target, w *worker) bool {
+	for _, d := range t.Deps() {
+		if !d.isDone(w) {
+			return false
+		}
+	}
+	return true
+}
+
 func Run(s *script, t target) {
-	q := newTargetQueue(t)
+	q := newTargetQueue(s, t)
 	for _, setvar := range s.setvars {
-		os.Setenv(setvar.key, setvar.value())
+		os.Setenv(setvar.key, setvar.value)
 	}
 	p := &pool{Size: 4}
 	p.start(q)

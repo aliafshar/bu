@@ -1,165 +1,124 @@
 package bu
 
 import (
-	"strings"
+	"fmt"
+	"io"
 )
 
-type block interface {
-	AppendBody(string)
-}
-
 type parser struct {
-	module *module
-	stack  []*token
-	line   int
-	node   block
+	tokenStream chan *token
 }
 
 func newParser() *parser {
-	return &parser{module: &module{targetIndex: map[string]target{}}, stack: []*token{}, line: 1}
+	return &parser{tokenStream: make(chan *token)}
 }
 
-func (p *parser) parse(l *lexer) {
-	go l.lex()
-	for l.lastToken.typ != tokenEof {
-		t := <-l.out
-		if t.typ != tokenWhitespace {
-			p.feed(t)
+func (p *parser) buildAst(r io.Reader) (*node, error) {
+	b := newBuilder()
+	go lex(r, p.tokenStream)
+	for {
+		t := <-p.tokenStream
+		if t.is(tokenWhitespace) {
+			// We just ignore whitespace from now on
+			continue
 		}
+		if t.is(tokenEof) {
+			break
+		}
+		b.feed(t)
 	}
-	p.finalize()
+	return b.root, nil
 }
 
-func (p *parser) handleRaw(ts []*token) {
-	if len(ts) < 2 {
-		// Trailing whitespace.
-		return
-	}
-	if p.node == nil {
-		parseError("Target body outside target.", ts[1])
-	} else {
-		p.node.AppendBody(ts[1].value())
-	}
+var targetBuilders = map[opType]func(*node) target {
+	opShell: func(n *node) target {
+		return &shellTarget{name: n.key, body: n.body()}
+	},
+	opQuestion: func(n *node) target {
+		return &questionTarget{name: n.key}
+	},
 }
 
-func (p *parser) handleTarget(ts []*token) {
-	tg := &shellTarget{
-		name: string(ts[0].val),
-		typ:  "sh",
-	}
-	p.module.targets = append(p.module.targets, tg)
-	finishedDeps := false
-	for _, t := range ts[2:] {
-		switch t.typ {
-		case tokenName:
-			if finishedDeps {
-				tg.typ = string(t.val)
-			} else {
-				tg.depsNames = append(tg.depsNames, string(t.val))
+func (p *parser) createShellTarget(n *node) target {
+		t := &shellTarget{name: n.key, body: n.body(), shell: "sh"}
+		for _, o := range n.nodes {
+			switch o.op {
+				case opUnnamed:
+					t.deps = append(t.deps, &targetDependency{name: o.key})
+					t.depsNames = append(t.depsNames, o.key)
+				case opShell:
+					t.shell = o.key
 			}
-		case tokenPling:
-			finishedDeps = true
+		}
+		return t
+}
+
+func (p *parser) createQuestionTarget(n *node) target {
+	t := &questionTarget{name: n.key, usage: n.body()}
+		for _, o := range n.nodes {
+			switch o.op {
+				case opUnnamed:
+					t.dflt = o.key
+					break
+			}
+		}
+
+		return t
+}
+
+func (p *parser) createTarget(m *module, n *node) error {
+	var t target
+	switch n.op {
+	case opQuestion:
+		t = p.createQuestionTarget(n)
+	case opShell:
+		t = p.createShellTarget(n)
+	}
+	m.targets = append(m.targets, t)
+	fmt.Printf("%+v\n", t)
+	return nil
+}
+
+func (p *parser) createImport(m *module, n *node) error {
+	for _, o := range n.nodes {
+		fmt.Println(o)
+		if o.op == opUnnamed {
+			i := &imports{key: o.key}
+			m.imports = append(m.imports, i)
 		}
 	}
-	p.node = tg
+	return nil
 }
 
-func (p *parser) handleQuestion(ts []*token) {
-	tg := &questionTarget{name: string(ts[0].val), bodyLines: []string{}}
-	p.module.targets = append(p.module.targets, tg)
-	if len(ts) > 2 {
-		tg.dflt = strings.Trim(ts[2].value(), " ")
-	}
-	p.node = tg
+func (p *parser) createSetvar(m *module, n *node) error {
+	s := &setvar{key: n.key, value: n.body()}
+	m.setvars = append(m.setvars, s)
+	return nil
 }
 
-func (p *parser) handleSetvar(ts []*token) {
-	tg := &setvar{key: ts[0].value()}
-	p.module.setvars = append(p.module.setvars, tg)
-	if len(ts) < 3 {
-		return
+func (p *parser) parse(s *script, r io.Reader) (*module, error) {
+	root, _ := p.buildAst(r)
+	fmt.Println(root)
+	m := &module{}
+	s.modules = append(s.modules, m)
+	if s.module == nil {
+		s.module = m
 	}
-	if ts[2].typ == tokenRaw {
-		tg.AppendBody(ts[2].value())
-		return
-	}
-	p.node = tg
-}
-
-func (p *parser) handleNamed(ts []*token) {
-	if len(ts) == 1 {
-		parseError("Identifier doing nothing.", ts[0])
-		return
-	}
-	switch ts[1].typ {
-	case tokenEquals:
-		p.handleSetvar(ts)
-	case tokenQuestion:
-		p.handleQuestion(ts)
-	case tokenColon:
-		p.handleTarget(p.stack)
-	}
-}
-
-func (p *parser) handleImport(ts []*token) {
-	if len(ts) < 2 {
-		parseError("Import not provided.", p.stack[0])
-		return
-	}
-	for _, t := range ts[1:] {
-		p.module.imports = append(p.module.imports, t.value())
-	}
-}
-
-func (p *parser) examine() {
-	switch p.stack[0].typ {
-	case tokenSof, tokenComment, tokenEof:
-	case tokenIndent:
-		p.handleRaw(p.stack)
-	case tokenLessthan:
-		p.handleImport(p.stack)
-	case tokenName:
-		p.handleNamed(p.stack)
-	default:
-		parseError("Unknown token.", p.stack[0])
-	}
-}
-
-func (p *parser) feed(t *token) {
-	if t.typ == tokenNewline {
-		p.line = p.line + len(t.val)
-		p.examine()
-		p.stack = []*token{}
-	} else {
-		t.line = p.line
-		p.stack = append(p.stack, t)
-	}
-}
-
-func trimJoinBody(lines []string) string {
-	if len(lines) == 0 {
-		return ""
-	}
-	i := 0
-	found := false
-	for !found {
-		r := string(lines[0][i])
-		switch r {
-		case " ", "\t":
-			i = i + 1
+	for _, bNode := range root.nodes {
+		fmt.Println(bNode)
+		switch bNode.op {
+		case opComment:
+			// Ignore comments here.
+			continue
+		case opImport:
+			p.createImport(m, bNode)
+		case opQuestion, opShell:
+			p.createTarget(m, bNode)
+		case opSetvar:
+			p.createSetvar(m, bNode)
 		default:
-			found = true
+			panic(bNode)
 		}
 	}
-	ls := []string{}
-	for _, line := range lines {
-		ls = append(ls, line[i:])
-	}
-	return strings.Join(ls, "\n")
-}
-
-func (p *parser) finalize() {
-	for _, t := range p.module.targets {
-		p.module.targetIndex[t.Name()] = t
-	}
+	return m, nil
 }

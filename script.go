@@ -1,93 +1,38 @@
 package bu
 
 import (
-	"github.com/aliafshar/toylog"
+	"fmt"
 	"os"
-	"os/user"
 	"path/filepath"
 )
 
-type module struct {
-	targets     []target
-	targetIndex map[string]target
-	setvars     []*setvar
-	imports     []string
-}
-
-type setvar struct {
-	key       string
-	bodyLines []string
-}
-
-func (t *setvar) AppendBody(s string) {
-	t.bodyLines = append(t.bodyLines, s)
-}
-
-func (t *setvar) value() string {
-	return trimJoinBody(t.bodyLines)
-}
-
 type script struct {
+	parser  *parser
 	modules []*module
+	module  *module
 	setvars []*setvar
 	path    []string
 	args    []string
 	targets map[string]target
 }
 
-func (s *script) Target(name string) target {
-	return s.targets[name]
+type module struct {
+	targets []target
+	setvars []*setvar
+	imports []*imports
 }
 
-func homeFilename(filename string) (string, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(usr.HomeDir, filename), nil
+type setvar struct {
+	key   string
+	value string
 }
 
-func defaultPath() []string {
-	path := []string{"."}
-	home, err := homeFilename(".bu")
-	if err == nil {
-		path = append(path, home)
-	}
-	return path
+type imports struct {
+	key string
 }
 
-func (s *script) finalize() {
-	mro := append(s.modules[1:], s.modules[0])
-	for _, m := range mro {
-		s.setvars = append(s.setvars, m.setvars...)
-		for _, t := range m.targets {
-			s.targets[t.Name()] = t
-		}
-	}
-	for _, t := range s.targets {
-		t.Finalize(s)
-	}
-}
-
-func (s *script) loadModule(filename string) {
-	f, err := os.Open(filename)
-	if err != nil {
-		toylog.Errorln("File not loaded.", filename, err)
-		return
-	}
-	defer f.Close()
-	l := NewLexer(f)
-	p := newParser()
-	p.parse(l)
-	s.modules = append(s.modules, p.module)
-	for _, i := range p.module.imports {
-		filename := s.resolveModule(i)
-		if filename == "" {
-			toylog.Errorln("Unable to find module", i)
-			continue
-		}
-		s.loadModule(filename)
-	}
+func newScript() *script {
+	return &script{parser: newParser(), targets: make(map[string]target), path: defaultPath()}
 }
 
 func (s *script) resolveModule(name string) string {
@@ -100,9 +45,54 @@ func (s *script) resolveModule(name string) string {
 	return ""
 }
 
-func NewScript(filename string, args []string) *script {
-	s := &script{path: defaultPath(), args: args, targets: make(map[string]target)}
-	s.loadModule(filename)
-	s.finalize()
-	return s
+func (s *script) loadFile(filename string) (*module, error) {
+	fmt.Println(filename)
+	f, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return s.parser.parse(s, f)
+}
+
+func (s *script) Target(name string) target {
+	if name == "" {
+		return s.module.targets[0]
+	}
+	return s.targets[name]
+}
+
+func Load(filename string, args ...string) (*script, error) {
+	s := newScript()
+	s.args = args
+	m, err := s.loadFile(filename)
+	fmt.Println(m)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, imp := range m.imports {
+		path := s.resolveModule(imp.key)
+		fmt.Println(path)
+		if path == "" {
+			fmt.Println("Error, unable to resolve module")
+			continue
+		}
+		s.loadFile(path)
+	}
+	s.aggregate()
+	fmt.Printf("%+v\n", s)
+	return s, nil
+}
+
+func (s *script) mro() []*module {
+	return append(s.modules[1:], s.module)
+}
+
+func (s *script) aggregate() {
+	for _, m := range s.mro() {
+		for _, t := range m.targets {
+			s.targets[t.Name()] = t
+		}
+		s.setvars = append(s.setvars, m.setvars...)
+	}
 }
