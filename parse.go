@@ -6,7 +6,7 @@ import (
 
 type parser struct {
 	tokenStream chan *token
-  root *node
+	root        *node
 }
 
 func newParser() *parser {
@@ -48,12 +48,12 @@ func (p *parser) createShellTarget(n *node) target {
 			t.depsNames = append(t.depsNames, o.key)
 		case opShell:
 			t.shell = shells[o.key]
-    case opQuestion:
-      t.deps = append(t.deps, &fileDependency{filename: o.key})
-    case opRedirect:
-      t.outfile = o.key
-    case opImport:
-      t.infile = o.key
+		case opQuestion:
+			t.deps = append(t.deps, &fileDependency{filename: o.key})
+		case opRedirect:
+			t.outfile = o.key
+		case opImport:
+			t.infile = o.key
 		}
 	}
 	return t
@@ -101,11 +101,11 @@ func (p *parser) createSetvar(m *module, n *node) error {
 }
 
 func (p *parser) parse(s *script, r io.Reader) (*module, error) {
-  root, err := p.buildAst(r)
-  p.root = root
-  if err != nil {
-    return nil, err
-  }
+	root, err := p.buildAst(r)
+	p.root = root
+	if err != nil {
+		return nil, err
+	}
 	m := &module{}
 	s.modules = append(s.modules, m)
 	if s.module == nil {

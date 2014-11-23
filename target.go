@@ -6,11 +6,11 @@ type target interface {
 	Name() string
 	Deps() []dependency
 	Run() result
-  Desc() string
+	Desc() string
 }
 
 type result interface {
-  Success() bool
-  Err() error
-  Desc() string
+	Success() bool
+	Err() error
+	Desc() string
 }

@@ -1,9 +1,9 @@
 package bu
 
-import(
-  "os"
-  "fmt"
+import (
+	"fmt"
 	"github.com/aliafshar/weezard"
+	"os"
 )
 
 type questionTarget struct {
@@ -24,34 +24,34 @@ func (t *questionTarget) Run() result {
 	q := &weezard.Question{Usage: t.usage, Default: t.dflt}
 	v, err := weezard.AskQuestion(q)
 	if err != nil {
-    return &questionResult{err: err}
+		return &questionResult{err: err}
 	}
 	os.Setenv(t.Name(), v)
-  return &questionResult{key: t.Name(), value: v}
+	return &questionResult{key: t.Name(), value: v}
 }
 
 func (t *questionTarget) Desc() string {
-  return "question"
+	return "question"
 }
 
 type questionResult struct {
-  err error
-  key string
-  value string
+	err   error
+	key   string
+	value string
 }
 
 func (r *questionResult) Success() bool {
-  return r.err == nil
+	return r.err == nil
 }
 
 func (r *questionResult) Desc() string {
-  if r.Success() {
-    return fmt.Sprintf("$%v=%q", r.key, r.value)
-  } else {
-    return fmt.Sprintf("%v", r.Err())
-  }
+	if r.Success() {
+		return fmt.Sprintf("$%v=%q", r.key, r.value)
+	} else {
+		return fmt.Sprintf("%v", r.Err())
+	}
 }
 
 func (r *questionResult) Err() error {
-  return r.err
+	return r.err
 }

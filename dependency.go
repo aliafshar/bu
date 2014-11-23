@@ -1,9 +1,8 @@
 package bu
 
 import (
-  "os"
+	"os"
 )
-
 
 type dependency interface {
 	isDone(w *worker) bool
@@ -27,8 +26,8 @@ type fileDependency struct {
 }
 
 func (d *fileDependency) isDone(w *worker) bool {
-  _, err := os.Stat(d.filename)
-  return err == nil
+	_, err := os.Stat(d.filename)
+	return err == nil
 }
 
 func (d *fileDependency) runnable(s *script) target {

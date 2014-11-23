@@ -30,12 +30,12 @@ const (
 )
 
 type node struct {
-	Type nodeType
-	key      string
-	nodes    []*node
-	lines    []string
-	op       opType
-	tokens   []*token
+	Type   nodeType
+	key    string
+	nodes  []*node
+	lines  []string
+	op     opType
+	tokens []*token
 }
 
 func (n *node) extend(line string) {

@@ -103,7 +103,7 @@ func (w *worker) run() {
 		}
 		if w.canRun(t) {
 			w.q.pop()
-      w.runTarget(t)
+			w.runTarget(t)
 			w.q.markDone(t)
 		} else {
 			w.q.rotate()
@@ -115,13 +115,13 @@ func (w *worker) run() {
 
 func (w *worker) runTarget(t target) result {
 	toylog.Infof("> [%v] %v", t.Name(), t.Desc())
-  res := t.Run()
-  if !res.Success() {
+	res := t.Run()
+	if !res.Success() {
 		toylog.Errorf("< [%v] fail %v", t.Name(), res.Desc())
-    return res
-  }
+		return res
+	}
 	toylog.Infof("< [%v] done %v", t.Name(), res.Desc())
-  return res
+	return res
 }
 
 func (w *worker) canRun(t target) bool {
