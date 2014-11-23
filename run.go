@@ -1,12 +1,11 @@
 package bu
 
 import (
-	"github.com/aliafshar/toylog"
-	"github.com/aliafshar/weezard"
 	"os"
-	"os/exec"
 	"sync"
 	"time"
+
+	"github.com/aliafshar/toylog"
 )
 
 type targetQueue struct {
@@ -102,9 +101,9 @@ func (w *worker) run() {
 		if t == nil {
 			break
 		}
-		if canRun(t, w) {
+		if w.canRun(t) {
 			w.q.pop()
-			t.Run()
+      w.runTarget(t)
 			w.q.markDone(t)
 		} else {
 			w.q.rotate()
@@ -114,42 +113,18 @@ func (w *worker) run() {
 	w.wg.Done()
 }
 
-var runners = map[string]string{
-	"sh": "bash",
-	"py": "python",
-	"":   "bash",
+func (w *worker) runTarget(t target) result {
+	toylog.Infof("> [%v] %v", t.Name(), t.Desc())
+  res := t.Run()
+  if !res.Success() {
+		toylog.Errorf("< [%v] fail %v", t.Name(), res.Desc())
+    return res
+  }
+	toylog.Infof("< [%v] done %v", t.Name(), res.Desc())
+  return res
 }
 
-func (t *shellTarget) Run() {
-	if t.body == "" {
-		toylog.Infof("> [%v] Nothing to run.")
-	}
-	toylog.Infof("> [%v] %v:%#v", t.Name(), t, t.body)
-	shell := runners[t.shell]
-	args := append([]string{"-c", t.body, t.Name()}, t.args...)
-	cmd := exec.Command(shell, args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
-		toylog.Errorf("< [%v] failure, %v", t.name, err)
-	} else {
-		toylog.Infof("< [%v] success", t.name)
-	}
-}
-
-func (t *questionTarget) Run() {
-	toylog.Infof("> [%v] question: %#v", t.Name(), t.usage)
-	q := &weezard.Question{Usage: t.usage, Default: t.dflt}
-	v, err := weezard.AskQuestion(q)
-	if err != nil {
-		toylog.Errorf("< [%v] failure, %v", t.Name(), err)
-	}
-	os.Setenv(t.Name(), v)
-	toylog.Infof("< [%v] success $%v=%q", t.Name(), t.Name(), v)
-}
-
-func canRun(t target, w *worker) bool {
+func (w *worker) canRun(t target) bool {
 	for _, d := range t.Deps() {
 		if !d.isDone(w) {
 			return false

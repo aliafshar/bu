@@ -1,0 +1,32 @@
+# Bu example
+
+
+# Defines a variable that is pushed into the environment of targets.
+my_var =42
+
+# Simple target that prints a variable.
+my_basic:
+  echo $my_var
+
+# Simple target that depends on another target.
+my_dep: my_basic
+  echo I depend on my_target
+
+# A target that will fail
+my_fail: !py
+  banana
+
+file_dep: redirect ?banana
+  echo does this work?
+
+redirect: >banana
+  echo how about this?
+
+empty:
+
+some_py: !py <banana >fanana
+  import sys
+  print sys.stdin.read()
+
+wat ? my_default
+  what is a banana?

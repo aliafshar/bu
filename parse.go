@@ -1,12 +1,12 @@
 package bu
 
 import (
-	"fmt"
 	"io"
 )
 
 type parser struct {
 	tokenStream chan *token
+  root *node
 }
 
 func newParser() *parser {
@@ -40,14 +40,20 @@ var targetBuilders = map[opType]func(*node) target{
 }
 
 func (p *parser) createShellTarget(n *node) target {
-	t := &shellTarget{name: n.key, body: n.body(), shell: "sh"}
+	t := &shellTarget{name: n.key, body: n.body(), shell: shells["sh"]}
 	for _, o := range n.nodes {
 		switch o.op {
 		case opUnnamed:
 			t.deps = append(t.deps, &targetDependency{name: o.key})
 			t.depsNames = append(t.depsNames, o.key)
 		case opShell:
-			t.shell = o.key
+			t.shell = shells[o.key]
+    case opQuestion:
+      t.deps = append(t.deps, &fileDependency{filename: o.key})
+    case opRedirect:
+      t.outfile = o.key
+    case opImport:
+      t.infile = o.key
 		}
 	}
 	return t
@@ -75,13 +81,11 @@ func (p *parser) createTarget(m *module, n *node) error {
 		t = p.createShellTarget(n)
 	}
 	m.targets = append(m.targets, t)
-	fmt.Printf("%+v\n", t)
 	return nil
 }
 
 func (p *parser) createImport(m *module, n *node) error {
 	for _, o := range n.nodes {
-		fmt.Println(o)
 		if o.op == opUnnamed {
 			i := &imports{key: o.key}
 			m.imports = append(m.imports, i)
@@ -97,15 +101,17 @@ func (p *parser) createSetvar(m *module, n *node) error {
 }
 
 func (p *parser) parse(s *script, r io.Reader) (*module, error) {
-	root, _ := p.buildAst(r)
-	fmt.Println(root)
+  root, err := p.buildAst(r)
+  p.root = root
+  if err != nil {
+    return nil, err
+  }
 	m := &module{}
 	s.modules = append(s.modules, m)
 	if s.module == nil {
 		s.module = m
 	}
-	for _, bNode := range root.nodes {
-		fmt.Println(bNode)
+	for _, bNode := range p.root.nodes {
 		switch bNode.op {
 		case opComment:
 			// Ignore comments here.
@@ -117,7 +123,7 @@ func (p *parser) parse(s *script, r io.Reader) (*module, error) {
 		case opSetvar:
 			p.createSetvar(m, bNode)
 		default:
-			panic(bNode)
+			logicalError("Unknown node type", bNode)
 		}
 	}
 	return m, nil

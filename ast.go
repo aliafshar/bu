@@ -30,7 +30,7 @@ const (
 )
 
 type node struct {
-	nodeType nodeType
+	Type nodeType
 	key      string
 	nodes    []*node
 	lines    []string
@@ -43,7 +43,7 @@ func (n *node) extend(line string) {
 }
 
 func (n *node) String() string {
-	return fmt.Sprintf("<%v, %q, %q, %+v, %q>", n.nodeType, n.op, n.key, n.nodes, n.body())
+	return fmt.Sprintf("<%v, %q, %q, %+v, %q>", n.Type, n.op, n.key, n.nodes, n.body())
 }
 
 func (n *node) body() string {
@@ -82,7 +82,7 @@ type builder struct {
 }
 
 func newBuilder() *builder {
-	return &builder{root: &node{nodeType: nodeModule}}
+	return &builder{root: &node{Type: nodeModule}}
 }
 
 func (p *builder) parseLine() {
@@ -102,12 +102,12 @@ func (p *builder) parseLine() {
 	// Now blocks
 	p.block = p.module.newNode()
 	p.block.tokens = p.line
-	p.block.nodeType = nodeBlock
+	p.block.Type = nodeBlock
 	var opIndex int
-	switch p.line[0].tokenType {
+	switch fst.tokenType {
 	case tokenName:
 		opIndex = 1
-		p.block.key = p.line[0].value()
+		p.block.key = fst.value()
 	case tokenLeft, tokenComment:
 		opIndex = 0
 	default:
@@ -128,7 +128,7 @@ func (p *builder) parseCommand(cmd []*token) {
 		switch t.tokenType {
 		case tokenName:
 			n = p.block.newNode()
-			n.nodeType = nodeOperator
+			n.Type = nodeOperator
 			n.key = t.value()
 			n.op = currentOp
 		case tokenRaw:

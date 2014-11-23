@@ -46,7 +46,6 @@ func (s *script) resolveModule(name string) string {
 }
 
 func (s *script) loadFile(filename string) (*module, error) {
-	fmt.Println(filename)
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -62,28 +61,6 @@ func (s *script) Target(name string) target {
 	return s.targets[name]
 }
 
-func Load(filename string, args ...string) (*script, error) {
-	s := newScript()
-	s.args = args
-	m, err := s.loadFile(filename)
-	fmt.Println(m)
-	if err != nil {
-		fmt.Println(err)
-	}
-	for _, imp := range m.imports {
-		path := s.resolveModule(imp.key)
-		fmt.Println(path)
-		if path == "" {
-			fmt.Println("Error, unable to resolve module")
-			continue
-		}
-		s.loadFile(path)
-	}
-	s.aggregate()
-	fmt.Printf("%+v\n", s)
-	return s, nil
-}
-
 func (s *script) mro() []*module {
 	return append(s.modules[1:], s.module)
 }
@@ -95,4 +72,23 @@ func (s *script) aggregate() {
 		}
 		s.setvars = append(s.setvars, m.setvars...)
 	}
+}
+
+func Load(filename string, args ...string) (*script, error) {
+	s := newScript()
+	s.args = args
+	m, err := s.loadFile(filename)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for _, imp := range m.imports {
+		path := s.resolveModule(imp.key)
+		if path == "" {
+			fmt.Println("Error, unable to resolve module")
+			continue
+		}
+		s.loadFile(path)
+	}
+	s.aggregate()
+	return s, nil
 }
