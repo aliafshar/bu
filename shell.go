@@ -80,7 +80,7 @@ func (sh *shlike) execute(t *shellTarget) *shellResult {
 		defer f.Close()
 		cmd.Stdin = f
 	}
-  err := cmd.Run()
+	err := cmd.Run()
 	if err != nil {
 		return newErrorShellResult(err)
 	}
