@@ -4,17 +4,20 @@ site_pages =index
 pandoc     =eval ~/.cabal/bin/pandoc
 template   =site/template.html
 repo       =https://github.com/aliafshar/bu.git
+readme     =README.md
+
+lint:
+  gofmt -w *.go */*.go
 
 site_build: docs_samples
   for p in $site_pages; do
     echo  site/${p}.md
-  $pandoc -s --template=$template -f markdown -i site/${p}.md -o site/${p}.html
+    $pandoc -s --template=$template -f markdown -i site/${p}.md -o site/${p}.html
   done
 
-site_serve:
+site_dev: site_build
   twistd -n web --path=site
 
-site_dev: site_build site_serve
 
 site_push: site_build
   cd site
@@ -25,37 +28,31 @@ site_push: site_build
 site_clone:
   git clone -b gh-pages $repo site
 
-fmt:
+fmt: >test.test
   gofmt -w *.go */*.go
 
-docs_samples: !py
-  import tempfile, subprocess, os
-  def lines():
-      f = open("README.md")
-      o = False
-      buf = ['']
-      for l in f:
-          line = l.rstrip('\n')
-          yield line
-          if line.startswith('```bu') and not line.startswith('```bu-'):
-              o = True
-              buf = ['']
-          elif line.startswith('```') and o:
-              o = False
-              f = tempfile.NamedTemporaryFile(delete=False)
-              f.write('\n'.join(buf + ['']))
-              f.close()
-              yield ''
-              yield '```bu-out'
-              out = subprocess.check_output(["bu", "-f", f.name, "demo"], stderr=subprocess.STDOUT)
-              os.unlink(f.name)
-              for line in out.splitlines():
-                yield line
-              yield '```'
-          elif o == True:
-              buf.append(line)
-  fo = open('site/index.md', 'w')
-  for line in lines():
-    fo.write(line + '\n')
-  fo.close()
-  
+docs_samples: !py >site/index.md
+  import tempfile, subprocess, os, sys
+  f = open(os.getenv('readme'))
+  o = False
+  buf = ['']
+  for l in f:
+      line = l.rstrip('\n')
+      print line
+      if line.startswith('```bu') and not line.startswith('```bu-'):
+          o = True
+          buf = ['']
+      elif line.startswith('```') and o:
+          o = False
+          f = tempfile.NamedTemporaryFile(delete=False)
+          f.write('\n'.join(buf + ['']))
+          f.close()
+          print ''
+          print '```bu-out'
+          out = subprocess.check_output(["bu", "-f", f.name, "demo"], stderr=subprocess.STDOUT)
+          os.unlink(f.name)
+          for line in out.splitlines():
+            print line
+          print '```'
+      elif o == True:
+          buf.append(line)

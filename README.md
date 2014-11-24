@@ -46,6 +46,40 @@ demo: !py
     print i
 ```
 
+### Redirects
+
+Target output can be redirected to a file. This is useful when using shells that
+don't have redirection, like Python.
+
+```bu
+demo: >my_file.txt !py
+  print "Save me in a file"
+```
+
+Similarly a file can be used for input on standard input.
+
+```bu
+make: >my_file.txt
+  print "Save me in a file"
+
+demo: <my_file.txt !py
+  import sys
+  print sys.stdin.read()
+```
+
+### File Dependencies
+
+A target may explicitly depend on the existence of a file or directory.
+
+```bu
+make:
+  echo Blah > my_file.txt
+
+demo: make ?my_file.txt
+  cat my_file.txt
+  rm my_file.txt
+```
+
 ### Indentation
 
 Target bodies must be indented by any whitespace, tab or space. Indentation must
@@ -63,10 +97,10 @@ demo:
   echo $DEMO
 ```
 
-Multiline variables are defined with the `=|` operator followed by a block.
+Multiline variables are defined exactly the same way in a block.
 
 ```bu
-DEMO =|
+DEMO =
     I
     am
     the variable
@@ -103,11 +137,11 @@ and this invocation:
 ## Questions
 
 ```bu
-demo ? n
+danger ? n
   Are you sure? (y/n)
 
-danger: demo
-  if [ $demo -eq y ]; then
+demo: danger
+  if [ $danger -eq y ]; then
     echo Confirmed, continuing
   fi
 ```

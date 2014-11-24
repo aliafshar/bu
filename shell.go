@@ -58,6 +58,7 @@ func (sh *shlike) execute(t *shellTarget) *shellResult {
 		return nil
 	}
 	args := append([]string{"-c", t.body, t.Name()}, t.args...)
+	toylog.Debugln(t.outfile)
 	cmd := exec.Command(sh.Cmd, args...)
 	if t.outfile != "" {
 		f, err := os.Create(t.outfile)
@@ -78,10 +79,8 @@ func (sh *shlike) execute(t *shellTarget) *shellResult {
 		}
 		defer f.Close()
 		cmd.Stdin = f
-	} else {
-		cmd.Stdin = os.Stdin
 	}
-	err := cmd.Run()
+  err := cmd.Run()
 	if err != nil {
 		return newErrorShellResult(err)
 	}
