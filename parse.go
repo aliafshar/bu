@@ -18,7 +18,7 @@ func (p *parser) buildAst(r io.Reader) (*node, error) {
 	go lex(r, p.tokenStream)
 	for {
 		t := <-p.tokenStream
-		if t.is(tokenWhitespace) {
+		if t.is(tokenWhitespace)  || t.is(tokenQuote) {
 			// We just ignore whitespace from now on
 			continue
 		}
@@ -44,12 +44,13 @@ func (p *parser) createShellTarget(n *node) target {
 	for _, o := range n.nodes {
 		switch o.op {
 		case opUnnamed:
-			t.deps = append(t.deps, &targetDependency{name: o.key})
-			t.depsNames = append(t.depsNames, o.key)
+      t.deps = append(t.deps, &targetDependency{name: o.key})
 		case opShell:
 			t.shell = shells[o.key]
 		case opQuestion:
 			t.deps = append(t.deps, &fileDependency{filename: o.key})
+    case opPipe:
+      t.pipe = append(t.pipe, &targetDependency{name: o.key})
 		case opRedirect:
 			t.outfile = o.key
 		case opImport:
@@ -72,6 +73,17 @@ func (p *parser) createQuestionTarget(n *node) target {
 	return t
 }
 
+func (p *parser) createPipeTarget(n *node) target {
+	t := &pipeTarget{name: n.key}
+	for _, o := range n.nodes {
+		switch o.op {
+		case opUnnamed, opPipe:
+			t.deps = append(t.deps, &targetDependency{name: o.key})
+		}
+	}
+  return t
+}
+
 func (p *parser) createTarget(m *module, n *node) error {
 	var t target
 	switch n.op {
@@ -79,6 +91,8 @@ func (p *parser) createTarget(m *module, n *node) error {
 		t = p.createQuestionTarget(n)
 	case opShell:
 		t = p.createShellTarget(n)
+  case opPipe:
+    t = p.createPipeTarget(n)
 	}
 	m.targets = append(m.targets, t)
 	return nil
@@ -118,7 +132,7 @@ func (p *parser) parse(s *script, r io.Reader) (*module, error) {
 			continue
 		case opImport:
 			p.createImport(m, bNode)
-		case opQuestion, opShell:
+		case opQuestion, opShell, opPipe:
 			p.createTarget(m, bNode)
 		case opSetvar:
 			p.createSetvar(m, bNode)

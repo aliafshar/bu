@@ -79,10 +79,10 @@ type pool struct {
 	Size int
 }
 
-func (p *pool) start(q *targetQueue) {
+func (p *pool) start(s *script, q *targetQueue) {
 	wg := &sync.WaitGroup{}
 	for i := 0; i < p.Size; i++ {
-		w := &worker{wg: wg, id: i, q: q}
+    w := &worker{wg: wg, id: i, q: q, script: s}
 		wg.Add(1)
 		go w.run()
 	}
@@ -93,6 +93,7 @@ type worker struct {
 	wg *sync.WaitGroup
 	id int
 	q  *targetQueue
+  script *script
 }
 
 func (w *worker) run() {
@@ -115,7 +116,7 @@ func (w *worker) run() {
 
 func (w *worker) runTarget(t target) result {
 	toylog.Infof("> [%v] %v", t.Name(), t.Desc())
-	res := t.Run()
+  res := t.Run(&runContext{worker: w, script: w.script, out: os.Stdout})
 	if !res.Success() {
 		toylog.Errorf("< [%v] fail %v", t.Name(), res.Desc())
 		return res
@@ -139,5 +140,5 @@ func Run(s *script, t target) {
 		os.Setenv(setvar.key, setvar.value)
 	}
 	p := &pool{Size: 4}
-	p.start(q)
+	p.start(s, q)
 }

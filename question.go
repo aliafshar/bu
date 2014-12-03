@@ -20,7 +20,7 @@ func (t *questionTarget) Deps() []dependency {
 	return nil
 }
 
-func (t *questionTarget) Run() result {
+func (t *questionTarget) Run(ctx *runContext) result {
 	q := &weezard.Question{Usage: t.usage, Default: t.dflt}
 	v, err := weezard.AskQuestion(q)
 	if err != nil {

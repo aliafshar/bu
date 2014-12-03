@@ -10,7 +10,7 @@ type tokenType int
 
 const (
 	tokenName       tokenType = iota
-	tokenColon      tokenType = iota
+	tokenColon
 	tokenEquals     tokenType = iota
 	tokenPling      tokenType = iota
 	tokenNewline    tokenType = iota
@@ -26,6 +26,7 @@ const (
 	tokenPipe       tokenType = iota
 	tokenSol        tokenType = iota
 	tokenEol        tokenType = iota
+  tokenQuote      tokenType = iota
 )
 
 var operators = map[string]tokenType{
@@ -40,6 +41,7 @@ var operators = map[string]tokenType{
 	"?":  tokenQuestion,
 	"|":  tokenPipe,
 	">":  tokenRight,
+  "'":  tokenQuote,
 }
 
 var names = map[tokenType]string{
@@ -60,6 +62,7 @@ var names = map[tokenType]string{
 	tokenPipe:       "PIPE",
 	tokenSol:        "SOL",
 	tokenEol:        "EOL",
+  tokenQuote: "QUOTE",
 }
 
 type token struct {
@@ -89,6 +92,7 @@ func (t *token) is(typ tokenType) bool {
 
 type lineLexer struct {
 	tokens []*token
+  isQuoted bool
 }
 
 func (l *lineLexer) String() string {
@@ -147,11 +151,17 @@ func (l *lineLexer) lex(text string) {
 		case tokenComment, tokenEquals:
 			l.newToken(tokenRaw, c)
 			continue
+    case tokenQuote:
+      if !l.isQuoted {
+        l.newToken(tokenName, c)
+        l.isQuoted = true
+        continue
+      }
 		case tokenRaw:
 			l.last().extend(c)
 			continue
 		case tokenName:
-			if typ == l.last().tokenType {
+			if typ == tokenName || (l.isQuoted && typ != tokenQuote) {
 				l.last().extend(c)
 				continue
 			}

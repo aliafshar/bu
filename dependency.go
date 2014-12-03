@@ -33,3 +33,7 @@ func (d *fileDependency) isDone(w *worker) bool {
 func (d *fileDependency) runnable(s *script) target {
 	return nil
 }
+
+type webDependency struct {
+  uri string
+}

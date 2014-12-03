@@ -1,11 +1,15 @@
 package bu
 
+import(
+  "io"
+)
+
 type targetType func(*node) target
 
 type target interface {
 	Name() string
 	Deps() []dependency
-	Run() result
+	Run(*runContext) result
 	Desc() string
 }
 
@@ -14,3 +18,11 @@ type result interface {
 	Err() error
 	Desc() string
 }
+
+type runContext struct {
+  in io.Reader
+  out io.Writer
+  worker *worker
+  script *script
+}
+

@@ -35,7 +35,7 @@ build:
 is a target named `run` that depends on a target named `build` that runs the
 shell command `go run cmd/bu.go`.
 
-### Target types
+## Target types
 
 Currently only shell and python are supported. Shell is the default, so no type
 is required to be passed explicitly. For a Python target, add the type.
@@ -46,7 +46,7 @@ demo: !py
     print i
 ```
 
-### Redirects
+## Redirects
 
 Target output can be redirected to a file. This is useful when using shells that
 don't have redirection, like Python.
@@ -67,7 +67,7 @@ demo: <my_file.txt !py
   print sys.stdin.read()
 ```
 
-### File Dependencies
+## File Dependencies
 
 A target may explicitly depend on the existence of a file or directory.
 
@@ -80,12 +80,12 @@ demo: make ?my_file.txt
   rm my_file.txt
 ```
 
-### Indentation
+## Indentation
 
 Target bodies must be indented by any whitespace, tab or space. Indentation must
 be consistent for Python scripts since Python is sensitive to this.
 
-## Variables
+# Variables
 
 
 Single line variables are defined with the `=` operator, like so:
@@ -134,7 +134,7 @@ and this invocation:
 
     $ bu demo FirstArgument
 
-## Questions
+# Questions
 
 ```bu
 danger ? n
@@ -155,7 +155,7 @@ Default values are optional, with the syntax:
     <name> ? [default]
         <question>
 
-## Imports
+# Imports
 
     < foo.bu
 
@@ -164,14 +164,27 @@ Will import foo.bu from the system path, which defaults to resolving, in order:
 * Current working directory `.`
 * Bu home directory `~/.bu`
 
-## Comments  
+# Comments  
 
 Line comments only. Non-line comments are undefined, especially in situations
 where values are taken to the end of a line, e.g. variable definitions
 
     myvariable = I am the value # this comment will be part of the value
 
-## Differenced from GNU make
+## Differences from GNU make
 
 * Each target is executed in the same shell
 * File existence is not explicitly taken to imply a dependency satisfaction
+
+# Prologue
+
+To you, designers and engineers of build systems, I present Bu.
+
+For years I have suffered your hideous constructs, your crushing assumptions,
+and your bizarre choices. The only revenge left to me is to build one that is
+worse, more disgusting, and infinitely heavier with dripping abomination, so
+that you may suffer the pain that I have suffered. Feel the gut-wrenching taste
+of bile in my mouth. Feel it, and let it sour the flavor of your day, your week
+and your month. May it lay barren the fields of your productivity.
+
+**To you, designers and engineers of build systems, I present Bu!**

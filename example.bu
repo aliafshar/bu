@@ -27,9 +27,25 @@ site: >index.html !py
 
 empty:
 
-some_py: !py <banana >fanana
+some_py: !py <example.bu >outputfile.txt
   import sys
   print sys.stdin.read()
 
 wat ? my_default
   what is a banana?
+
+'this is quoted':
+  echo what??
+
+boo: >banana
+  echo piped
+
+count:
+  wc -l
+
+hex:
+  wcalc -h
+
+foo | boo | count | hex
+
+  
