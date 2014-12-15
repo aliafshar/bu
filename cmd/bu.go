@@ -31,10 +31,5 @@ func main() {
 		return
 	}
 	toylog.Infof(versionInfo+", loading %q", *bufile)
-	s, _ := bu.Load(*bufile, *targetArgs...)
-	t := s.Target(*targetName)
-	if t == nil {
-		toylog.Fatalf("target not found %q", *targetName)
-	}
-	bu.Run(s, t)
+	bu.Run(*bufile, *targetName, *targetArgs...)
 }

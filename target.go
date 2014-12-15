@@ -1,28 +1,20 @@
 package bu
 
-import(
-  "io"
-)
 
-type targetType func(*node) target
-
-type target interface {
-	Name() string
-	Deps() []dependency
-	Run(*runContext) result
-	Desc() string
+type target struct {
+	name     string
+	body     string
+	shell    string
+	deps     []dependency
+	pipe     []dependency
+	redirect *redirect
 }
 
-type result interface {
-	Success() bool
-	Err() error
-	Desc() string
+type result struct {
+	err  error
+	desc string
 }
 
-type runContext struct {
-  in io.Reader
-  out io.Writer
-  worker *worker
-  script *script
+func (r *result) success() bool {
+	return r.err == nil
 }
-

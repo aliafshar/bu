@@ -5,35 +5,35 @@ import (
 )
 
 type dependency interface {
-	isDone(w *worker) bool
-	runnable(s *script) target
+	can(rt *runtime) bool
+	resolve(rt *runtime) *target
 }
 
 type targetDependency struct {
 	name string
 }
 
-func (d *targetDependency) isDone(w *worker) bool {
-	return w.q.hasDone(d.name)
+func (d *targetDependency) can(rt *runtime) bool {
+	return rt.history.done(d.name)
 }
 
-func (d *targetDependency) runnable(s *script) target {
-	return s.Target(d.name)
+func (d *targetDependency) resolve(r *runtime) *target {
+	return r.script.Target(d.name)
 }
 
 type fileDependency struct {
 	filename string
 }
 
-func (d *fileDependency) isDone(w *worker) bool {
+func (d *fileDependency) can(rt *runtime) bool {
 	_, err := os.Stat(d.filename)
 	return err == nil
 }
 
-func (d *fileDependency) runnable(s *script) target {
+func (d *fileDependency) resolve(r *runtime) *target {
 	return nil
 }
 
 type webDependency struct {
-  uri string
+	uri string
 }

@@ -13,11 +13,11 @@ type script struct {
 	setvars []*setvar
 	path    []string
 	args    []string
-	targets map[string]target
+	targets map[string]*target
 }
 
 type module struct {
-	targets []target
+	targets []*target
 	setvars []*setvar
 	imports []*imports
 }
@@ -32,7 +32,12 @@ type imports struct {
 }
 
 func newScript() *script {
-	return &script{parser: newParser(), targets: make(map[string]target), path: defaultPath()}
+	return &script{
+		parser:  newParser(),
+		targets: make(map[string]*target),
+		// TODO move out of script
+		path: defaultPath(),
+	}
 }
 
 func (s *script) resolveModule(name string) string {
@@ -54,7 +59,7 @@ func (s *script) loadFile(filename string) (*module, error) {
 	return s.parser.parse(s, f)
 }
 
-func (s *script) Target(name string) target {
+func (s *script) Target(name string) *target {
 	if name == "" {
 		return s.module.targets[0]
 	}
@@ -68,7 +73,7 @@ func (s *script) mro() []*module {
 func (s *script) aggregate() {
 	for _, m := range s.mro() {
 		for _, t := range m.targets {
-			s.targets[t.Name()] = t
+			s.targets[t.name] = t
 		}
 		s.setvars = append(s.setvars, m.setvars...)
 	}

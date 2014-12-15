@@ -51,15 +51,20 @@ func (n *node) body() string {
 		return ""
 	}
 	i := 0
-	found := false
-	for !found {
-		r := string(n.lines[0][i])
-		switch r {
-		case " ", "\t":
-			i = i + 1
-		default:
-			found = true
+	j := 0
+	for {
+		if i == len(n.lines[j]) {
+			j++
 		}
+		if j == len(n.lines) {
+			break
+		}
+		r := string(n.lines[j][i])
+		if r == " " || r == "\t" {
+			i++
+			continue
+		}
+		break
 	}
 	ls := []string{}
 	for _, line := range n.lines {

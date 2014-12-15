@@ -1,36 +1,18 @@
 package bu
 
 import (
-	"os"
 	"sync"
 	"time"
 
 	"github.com/aliafshar/toylog"
 )
 
-type targetQueue struct {
-	items []target
-	done  map[string]bool
+type queue struct {
+	items []*target
 	sync.Mutex
 }
 
-func (q *targetQueue) build(s *script, t target) {
-	q.items = append(q.items, t)
-	for _, d := range t.Deps() {
-		u := d.runnable(s)
-		if u != nil {
-			q.build(s, u)
-		}
-	}
-}
-
-func newTargetQueue(s *script, t target) *targetQueue {
-	q := &targetQueue{items: []target{}, done: make(map[string]bool)}
-	q.build(s, t)
-	return q
-}
-
-func (q *targetQueue) peek() target {
+func (q *queue) peek() *target {
 	q.Lock()
 	defer q.Unlock()
 	if len(q.items) == 0 {
@@ -39,7 +21,7 @@ func (q *targetQueue) peek() target {
 	return q.items[0]
 }
 
-func (q *targetQueue) rotate() {
+func (q *queue) rotate() {
 	q.Lock()
 	defer q.Unlock()
 	if len(q.items) > 1 {
@@ -47,7 +29,7 @@ func (q *targetQueue) rotate() {
 	}
 }
 
-func (q *targetQueue) pop() target {
+func (q *queue) pop() *target {
 	q.Lock()
 	defer q.Unlock()
 	if len(q.items) == 0 {
@@ -58,87 +40,112 @@ func (q *targetQueue) pop() target {
 	return t
 }
 
-func (q *targetQueue) markDone(t target) {
-	q.Lock()
-	defer q.Unlock()
-	q.done[t.Name()] = true
-}
-
-func (q *targetQueue) hasDone(ts ...string) bool {
-	q.Lock()
-	defer q.Unlock()
-	for _, t := range ts {
-		if !q.done[t] {
-			return false
-		}
-	}
-	return true
-}
-
 type pool struct {
-	Size int
-}
-
-func (p *pool) start(s *script, q *targetQueue) {
-	wg := &sync.WaitGroup{}
-	for i := 0; i < p.Size; i++ {
-    w := &worker{wg: wg, id: i, q: q, script: s}
-		wg.Add(1)
-		go w.run()
-	}
-	wg.Wait()
+	size    int
+	workers []*worker
 }
 
 type worker struct {
-	wg *sync.WaitGroup
 	id int
-	q  *targetQueue
-  script *script
+	rt *runtime
 }
 
-func (w *worker) run() {
+func (w *worker) start() {
 	for {
-		t := w.q.peek()
+		t := w.rt.queue.peek()
 		if t == nil {
 			break
 		}
-		if w.canRun(t) {
-			w.q.pop()
-			w.runTarget(t)
-			w.q.markDone(t)
+		if w.can(t) {
+			w.rt.queue.pop()
+			w.run(t)
+			w.rt.history.do(t.name)
 		} else {
-			w.q.rotate()
+			w.rt.queue.rotate()
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
-	w.wg.Done()
+	w.rt.wait.Done()
 }
 
-func (w *worker) runTarget(t target) result {
-	toylog.Infof("> [%v] %v", t.Name(), t.Desc())
-  res := t.Run(&runContext{worker: w, script: w.script, out: os.Stdout})
-	if !res.Success() {
-		toylog.Errorf("< [%v] fail %v", t.Name(), res.Desc())
+func (w *worker) run(t *target) *result {
+	toylog.Infof("> [%v] %v", t.name, t.name)
+	p := newPipe(w.rt, t)
+	res := p.run()
+	if !res.success() {
+		toylog.Errorf("< [%v] fail %v", t.name)
 		return res
 	}
-	toylog.Infof("< [%v] done %v", t.Name(), res.Desc())
+	toylog.Infof("< [%v] done %v", t.name)
 	return res
 }
 
-func (w *worker) canRun(t target) bool {
-	for _, d := range t.Deps() {
-		if !d.isDone(w) {
+func (w *worker) can(t *target) bool {
+	for _, d := range t.deps {
+		if !d.can(w.rt) {
 			return false
 		}
 	}
 	return true
 }
 
-func Run(s *script, t target) {
-	q := newTargetQueue(s, t)
-	for _, setvar := range s.setvars {
-		os.Setenv(setvar.key, setvar.value)
+type history struct {
+	log map[string]bool
+	sync.Mutex
+}
+
+func (h *history) do(key string) {
+	h.Lock()
+	defer h.Unlock()
+	h.log[key] = true
+}
+
+func (h *history) done(keys ...string) bool {
+	h.Lock()
+	defer h.Unlock()
+	for _, t := range keys {
+		if !h.log[t] {
+			return false
+		}
 	}
-	p := &pool{Size: 4}
-	p.start(s, q)
+	return true
+}
+
+type runtime struct {
+	script  *script
+	pool    *pool
+	queue   *queue
+	history *history
+	wait    *sync.WaitGroup
+	argv    []string
+}
+
+func (r *runtime) start() {
+	for i := 0; i < r.pool.size; i++ {
+		w := &worker{id: i, rt: r}
+		r.pool.workers = append(r.pool.workers, w)
+		r.wait.Add(1)
+		go w.start()
+	}
+	r.wait.Wait()
+}
+
+func (r *runtime) build(t *target) {
+	r.queue.items = append(r.queue.items, t)
+	for _, d := range t.deps {
+		u := d.resolve(r)
+		if u != nil {
+			r.build(u)
+		}
+	}
+}
+
+func newRuntime(script *script) *runtime {
+	return &runtime{
+		script:  script,
+		pool:    &pool{size: 4},
+		history: &history{log: make(map[string]bool)},
+		wait:    &sync.WaitGroup{},
+		queue:   &queue{},
+	}
 }

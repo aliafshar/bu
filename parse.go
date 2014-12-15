@@ -18,7 +18,7 @@ func (p *parser) buildAst(r io.Reader) (*node, error) {
 	go lex(r, p.tokenStream)
 	for {
 		t := <-p.tokenStream
-		if t.is(tokenWhitespace)  || t.is(tokenQuote) {
+		if t.is(tokenWhitespace) || t.is(tokenQuote) {
 			// We just ignore whitespace from now on
 			continue
 		}
@@ -30,72 +30,30 @@ func (p *parser) buildAst(r io.Reader) (*node, error) {
 	return b.root, nil
 }
 
-var targetBuilders = map[opType]func(*node) target{
-	opShell: func(n *node) target {
-		return &shellTarget{name: n.key, body: n.body()}
-	},
-	opQuestion: func(n *node) target {
-		return &questionTarget{name: n.key}
-	},
-}
-
-func (p *parser) createShellTarget(n *node) target {
-	t := &shellTarget{name: n.key, body: n.body(), shell: shells["sh"]}
+func (p *parser) createTarget(n *node) *target {
+	t := &target{
+		name:     n.key,
+		body:     n.body(),
+		shell:    "sh",
+		redirect: &redirect{},
+	}
 	for _, o := range n.nodes {
 		switch o.op {
 		case opUnnamed:
-      t.deps = append(t.deps, &targetDependency{name: o.key})
+			t.deps = append(t.deps, &targetDependency{name: o.key})
 		case opShell:
-			t.shell = shells[o.key]
+			t.shell = o.key
 		case opQuestion:
 			t.deps = append(t.deps, &fileDependency{filename: o.key})
-    case opPipe:
-      t.pipe = append(t.pipe, &targetDependency{name: o.key})
+		case opPipe:
+			t.pipe = append(t.pipe, &targetDependency{name: o.key})
 		case opRedirect:
-			t.outfile = o.key
+			t.redirect.ofile = o.key
 		case opImport:
-			t.infile = o.key
+			t.redirect.ifile = o.key
 		}
 	}
 	return t
-}
-
-func (p *parser) createQuestionTarget(n *node) target {
-	t := &questionTarget{name: n.key, usage: n.body()}
-	for _, o := range n.nodes {
-		switch o.op {
-		case opUnnamed:
-			t.dflt = o.key
-			break
-		}
-	}
-
-	return t
-}
-
-func (p *parser) createPipeTarget(n *node) target {
-	t := &pipeTarget{name: n.key}
-	for _, o := range n.nodes {
-		switch o.op {
-		case opUnnamed, opPipe:
-			t.deps = append(t.deps, &targetDependency{name: o.key})
-		}
-	}
-  return t
-}
-
-func (p *parser) createTarget(m *module, n *node) error {
-	var t target
-	switch n.op {
-	case opQuestion:
-		t = p.createQuestionTarget(n)
-	case opShell:
-		t = p.createShellTarget(n)
-  case opPipe:
-    t = p.createPipeTarget(n)
-	}
-	m.targets = append(m.targets, t)
-	return nil
 }
 
 func (p *parser) createImport(m *module, n *node) error {
@@ -133,7 +91,8 @@ func (p *parser) parse(s *script, r io.Reader) (*module, error) {
 		case opImport:
 			p.createImport(m, bNode)
 		case opQuestion, opShell, opPipe:
-			p.createTarget(m, bNode)
+			t := p.createTarget(bNode)
+			m.targets = append(m.targets, t)
 		case opSetvar:
 			p.createSetvar(m, bNode)
 		default:

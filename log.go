@@ -9,7 +9,7 @@ func parseError(msg string, t *token) {
 }
 
 func dependencyError(depName string, t target) {
-	toylog.Errorf("Missing dependency %q in %q.", depName, t.Name())
+	toylog.Errorf("Missing dependency %q in %q.", depName, t.name)
 }
 
 func logicalError(msg string, n *node) {
