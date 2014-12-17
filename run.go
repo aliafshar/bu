@@ -1,6 +1,7 @@
 package bu
 
 import (
+	"os"
 	"sync"
 	"time"
 
@@ -40,6 +41,12 @@ func (q *queue) pop() *target {
 	return t
 }
 
+func (q *queue) push(t *target) {
+	q.Lock()
+	defer q.Unlock()
+	q.items = append(q.items, t)
+}
+
 type pool struct {
 	size    int
 	workers []*worker
@@ -52,16 +59,15 @@ type worker struct {
 
 func (w *worker) start() {
 	for {
-		t := w.rt.queue.peek()
+		t := w.rt.queue.pop()
 		if t == nil {
 			break
 		}
 		if w.can(t) {
-			w.rt.queue.pop()
 			w.run(t)
 			w.rt.history.do(t.name)
 		} else {
-			w.rt.queue.rotate()
+			w.rt.queue.push(t)
 			time.Sleep(100 * time.Millisecond)
 		}
 	}
@@ -73,10 +79,10 @@ func (w *worker) run(t *target) *result {
 	p := newPipe(w.rt, t)
 	res := p.run()
 	if !res.success() {
-		toylog.Errorf("< [%v] fail %v", t.name)
+		toylog.Errorf("< [%v] fail %v %v", t.name, res.desc, res.err)
 		return res
 	}
-	toylog.Infof("< [%v] done %v", t.name)
+	toylog.Infof("< [%v] done %v", t.name, res.desc)
 	return res
 }
 
@@ -118,6 +124,7 @@ type runtime struct {
 	history *history
 	wait    *sync.WaitGroup
 	argv    []string
+	env     []string
 }
 
 func (r *runtime) start() {
@@ -141,11 +148,18 @@ func (r *runtime) build(t *target) {
 }
 
 func newRuntime(script *script) *runtime {
+	// TODO share an environment
+	for _, e := range script.setvars {
+		os.Setenv(e.key, e.value)
+	}
+	var env []string
+	copy(os.Environ(), env)
 	return &runtime{
 		script:  script,
 		pool:    &pool{size: 4},
 		history: &history{log: make(map[string]bool)},
 		wait:    &sync.WaitGroup{},
 		queue:   &queue{},
+		env:     env,
 	}
 }

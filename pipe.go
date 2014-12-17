@@ -3,19 +3,16 @@ package bu
 import (
 	"io"
 	"os/exec"
-	"sync"
 
-  _ "github.com/aliafshar/toylog"
+	"github.com/aliafshar/toylog"
 )
 
 type pipe struct {
 	cmds []*exec.Cmd
-	sync.WaitGroup
 }
 
-func (p *pipe) work(cmd *exec.Cmd) {
-	cmd.Run()
-	p.Done()
+func (p *pipe) work(cmd *exec.Cmd, out chan *result) {
+	out <- &result{err: cmd.Run()}
 }
 
 func (p *pipe) connect(final io.Writer) {
@@ -24,23 +21,30 @@ func (p *pipe) connect(final io.Writer) {
 	}
 	last := len(p.cmds) - 1
 	for i := 0; i < last; i++ {
-		p.cmds[i+1].Stdin, p.cmds[i].Stdout = io.Pipe()
+		out, err := p.cmds[i].StdoutPipe()
+		if err != nil {
+			toylog.Errorln("unable to make a pipe", err)
+		}
+		p.cmds[i+1].Stdin = out
 	}
 	p.cmds[last].Stdout = final
 }
 
 func (p *pipe) run() *result {
+	out := make(chan *result)
 	for _, c := range p.cmds {
-		p.Add(1)
-		go p.work(c)
+		go p.work(c, out)
 	}
-	p.Wait()
-	return &result{}
+	var rs []*result
+	for _ = range p.cmds {
+		rs = append(rs, <-out)
+	}
+	return combinedResult(rs)
 }
 
 func newPipe(r *runtime, t *target) *pipe {
-  fst := t.cmd(r)
-  fst.Stdin = t.redirect.in()
+	fst := t.cmd(r)
+	fst.Stdin = t.redirect.in()
 	p := &pipe{cmds: []*exec.Cmd{fst}}
 	for _, d := range t.pipe {
 		p.cmds = append(p.cmds, d.resolve(r).cmd(r))

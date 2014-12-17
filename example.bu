@@ -1,6 +1,5 @@
 # Bu example
 
-
 # Defines a variable that is pushed into the environment of targets.
 my_var =42
 
@@ -13,18 +12,36 @@ my_dep: my_basic
   echo I depend on my_target
 
 # A target that will fail
-my_fail: !py
-  banana
+my_fail:
+  false
 
-file_dep: redirect ?banana
+# depends on the file '/tmp/banana' existing
+# and a target that creates that file
+file_dep: redirect ?/tmp/banana
   echo does this work?
 
-redirect: >banana
+# depends on a 200 from http://www.wikipedia.org/
+web_dep: @www.wikipedia.org
+  echo yes wikipedia is alive
+
+# waits until it gets a 200 response from http://localhost:8080/
+wait_serve: serve @'localhost:8080'
+  echo server is up
+  killall twistd
+
+# starts a local web server
+serve:
+  twistd web
+
+# redirects output to '/tmp/banana'
+redirect: >/tmp/banana
   echo how about this?
 
 site: !py >index.html
   print "<h1>Hello world</h1>"
 
+# index.html is passed into the target's stdin, useful when not using bash and
+# shells with annoyingly difficult redirection.
 read: <index.html
   cat
 
@@ -37,15 +54,20 @@ some_py: !py <example.bu >outputfile.txt
 'this is quoted':
   echo what??
 
-boo:
-  echo piped
-
 count:
-  wc -l
+  wc -c
 
 hex:
   wcalc -h
 
-foo: | boo | count | hex
+pipe: | count | hex
+  echo piped
 
-  
+e1:
+  export A=banana
+
+e2: e1
+  echo HOME 
+
+
+

@@ -47,6 +47,8 @@ func (p *parser) createTarget(n *node) *target {
 			t.deps = append(t.deps, &fileDependency{filename: o.key})
 		case opPipe:
 			t.pipe = append(t.pipe, &targetDependency{name: o.key})
+		case opAt:
+			t.deps = append(t.deps, &webDependency{uri: o.key})
 		case opRedirect:
 			t.redirect.ofile = o.key
 		case opImport:

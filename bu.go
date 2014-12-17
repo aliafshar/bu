@@ -1,6 +1,7 @@
 package bu
 
 import (
+  "sort"
 	"github.com/aliafshar/toylog"
 )
 
@@ -13,4 +14,14 @@ func Run(bufile, targetName string, args ...string) {
 	}
 	r.build(t)
 	r.start()
+}
+
+func List(bufile string) []string {
+	s, _ := Load(bufile)
+  var ts []string
+  for k := range s.targets {
+    ts = append(ts, k)
+  }
+  sort.Strings(ts)
+  return ts
 }

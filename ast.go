@@ -27,6 +27,7 @@ const (
 	opSetvar   opType = "SETVAR"
 	opComment  opType = "COMMENT"
 	opImport   opType = "IMPORT"
+	opAt       opType = "AT"
 )
 
 type node struct {
@@ -162,6 +163,7 @@ var opTypes = map[tokenType]opType{
 	tokenEquals:   opSetvar,
 	tokenComment:  opComment,
 	tokenLeft:     opImport,
+	tokenAt:       opAt,
 }
 
 func (p *builder) feed(t *token) {
