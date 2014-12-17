@@ -78,15 +78,11 @@ font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
 
     <nav class="navdrawer-container promote-layer">
       <h4>Navigation</h4>
-      <ul>
-        <li><a href="#targets">Targets</a></li>
-        <li><a href="#variables">Variables</a></li>
-        <li><a href="#questions">Questions</a></li>
-        <li><a href="#positional-arguments">Positional Arguments</a></li>
-        <li><a href="#imports">Imports</a></li>
-        <li><a href="#comments">Comments</a></li>
-      
-      </ul>
+
+
+      $if(toc)$
+    $toc$
+      $endif$
     </nav>
 
 
@@ -109,9 +105,10 @@ $body$
 
 </main>
 
-    <!-- build:js scripts/main.min.js -->
+<footer>
+</footer>
+
     <script src="scripts/main.js"></script>
-    <!-- endbuild -->
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
     <script>
