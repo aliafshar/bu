@@ -110,7 +110,7 @@ font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
 <p>Here is a tiny example.</p>
 <pre class="bu"><code>demo:
   echo Hello, world!</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpnVvemA&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp8o2oRf&quot;
 I: &gt; [demo] !bash &quot;echo Hello, world!&quot;
 Hello, world!
 I: &lt; [demo] done 0
@@ -126,7 +126,7 @@ I: &lt; [demo] done 0
 
 build:
   echo a dependency</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmprLYqBy&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpgnkppf&quot;
 I: &gt; [build] !bash &quot;echo a dependency&quot;
 a dependency
 I: &lt; [build] done 0
@@ -140,7 +140,7 @@ I: &lt; [demo] done 0
 <pre class="bu"><code>demo: !py
   for i in range(5):
     print i</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp_hM9Sv&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp08Mfnn&quot;
 I: &gt; [demo] !python &quot;for i in range(5):\n  print i&quot;
 0
 1
@@ -153,7 +153,7 @@ I: &lt; [demo] done 0
 <p>Target output can be redirected to a file. This is useful when using shells that don't have redirection, like Python.</p>
 <pre class="bu"><code>demo: &gt;my_file.txt !py
   print &quot;Save me in a file&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp0YlwfV&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpVmT7jf&quot;
 I: &gt; [demo] !python &quot;print \&quot;Save me in a file\&quot;&quot;
 I: &lt; [demo] done 0
 </code></pre>
@@ -164,7 +164,7 @@ I: &lt; [demo] done 0
 demo: &lt;my_file.txt !py
   import sys
   print sys.stdin.read()</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpaqAaAK&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpKp1lDN&quot;
 I: &gt; [demo] !python &quot;import sys\nprint sys.stdin.read()&quot;
 Save me in a file
 
@@ -178,7 +178,7 @@ I: &lt; [demo] done 0
 demo: make ?my_file.txt
   cat my_file.txt
   rm my_file.txt</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpuxWMrt&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpBRgEHG&quot;
 I: &gt; [make] !bash &quot;echo Blah &gt; my_file.txt&quot;
 I: &lt; [make] done 0
 I: &gt; [demo] !bash &quot;cat my_file.txt\nrm my_file.txt&quot;
@@ -193,7 +193,7 @@ I: &lt; [demo] done 0
 
 demo:
   echo $DEMO</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpKgb5pK&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpx2KPEp&quot;
 I: &gt; [demo] !bash &quot;echo $DEMO&quot;
 I am the variable content
 I: &lt; [demo] done 0
@@ -207,7 +207,7 @@ I: &lt; [demo] done 0
 
 demo:
   echo &quot;$DEMO&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmptitkct&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpM5ER0p&quot;
 I: &gt; [demo] !bash &quot;echo \&quot;$DEMO\&quot;&quot;
 I
 am
@@ -222,7 +222,7 @@ I: &lt; [demo] done 0
 <p><code>$0</code>, <code>$1</code>, <code>$*</code>, <code>$@</code> etc (in shell) and <code>sys.args</code> (in Python) are available as additional arguments passed to the bu invocation. Consider this target:</p>
 <pre class="bu"><code>demo:
   echo Hi, &quot;$0&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp7aAbTG&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpMZ1rUE&quot;
 I: &gt; [demo] !bash &quot;echo Hi, \&quot;$0\&quot;&quot;
 Hi, demo
 I: &lt; [demo] done 0
@@ -237,7 +237,7 @@ demo: danger
   if [ $danger -eq y ]; then
     echo Confirmed, continuing
   fi</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp27gNLB&quot;
+<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp4oBm6G&quot;
 I: &gt; [danger] question
 [1mAre you sure? (y/n)[0m (default=[1m[34mn[0m[0m) &gt; E: &lt; [danger] fail EOF
 I: &gt; [demo] !bash &quot;if [ $danger -eq y ]; then\n  echo Confirmed, continuing\nfi&quot;
