@@ -1,8 +1,6 @@
-```
 ┏━ ┃ ┃
 ┏━┃┃ ┃
 ━━ ━━┛
-```
 
 Bu is a tool to help you run common tasks. It is something like a simple version
 of GNU make with some additional features. You define a set of tasks and it will
