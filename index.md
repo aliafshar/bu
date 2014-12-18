@@ -12,7 +12,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmp8o2oRf"
+I: bu, version 0.0, loading "/tmp/tmpZnzeCd"
 I: > [demo] !bash "echo Hello, world!"
 Hello, world!
 I: < [demo] done 0
@@ -41,7 +41,7 @@ build:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpgnkppf"
+I: bu, version 0.0, loading "/tmp/tmpQp3cI2"
 I: > [build] !bash "echo a dependency"
 a dependency
 I: < [build] done 0
@@ -66,7 +66,7 @@ demo: !py
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmp08Mfnn"
+I: bu, version 0.0, loading "/tmp/tmpM10VZ0"
 I: > [demo] !python "for i in range(5):\n  print i"
 0
 1
@@ -88,7 +88,7 @@ demo: >my_file.txt !py
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpVmT7jf"
+I: bu, version 0.0, loading "/tmp/tmpuU_c80"
 I: > [demo] !python "print \"Save me in a file\""
 I: < [demo] done 0
 
@@ -106,7 +106,7 @@ demo: <my_file.txt !py
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpKp1lDN"
+I: bu, version 0.0, loading "/tmp/tmpl6D3eq"
 I: > [demo] !python "import sys\nprint sys.stdin.read()"
 Save me in a file
 
@@ -128,7 +128,7 @@ demo: make ?my_file.txt
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpBRgEHG"
+I: bu, version 0.0, loading "/tmp/tmp3chT1J"
 I: > [make] !bash "echo Blah > my_file.txt"
 I: < [make] done 0
 I: > [demo] !bash "cat my_file.txt\nrm my_file.txt"
@@ -155,7 +155,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpx2KPEp"
+I: bu, version 0.0, loading "/tmp/tmpK854ek"
 I: > [demo] !bash "echo $DEMO"
 I am the variable content
 I: < [demo] done 0
@@ -176,7 +176,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpM5ER0p"
+I: bu, version 0.0, loading "/tmp/tmpwOMnUc"
 I: > [demo] !bash "echo \"$DEMO\""
 I
 am
@@ -207,7 +207,7 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpMZ1rUE"
+I: bu, version 0.0, loading "/tmp/tmpnopzvg"
 I: > [demo] !bash "echo Hi, \"$0\""
 Hi, demo
 I: < [demo] done 0
@@ -231,7 +231,7 @@ demo: danger
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmp4oBm6G"
+I: bu, version 0.0, loading "/tmp/tmp8buOe7"
 I: > [danger] question
 [1mAre you sure? (y/n)[0m (default=[1m[34mn[0m[0m) > E: < [danger] fail EOF
 I: > [demo] !bash "if [ $danger -eq y ]; then\n  echo Confirmed, continuing\nfi"
