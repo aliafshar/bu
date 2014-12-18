@@ -1,8 +1,23 @@
+```
 ┏━ ┃ ┃
-
-┏━┃┃ ┃
-
+┏━┃┃ ┃   version 0.0
 ━━ ━━┛
+
+usage: bu [<flags>] [<target> [<args>]]
+
+A build utility.
+
+Flags:
+  --help         Show help.
+  -f, --bufile=main.bu  Path to bu file.
+  -v, --version  Print the bu version and exit.
+  -d, --debug    Verbose logging.
+  -l, --list     List targets.
+
+Args:
+  [<target>]  Execute the named target.
+  [<args>]    Arguments to pass to the bu target.
+```
 
 Bu is a tool to help you run common tasks. It is something like a simple version
 of GNU make with some additional features. You define a set of tasks and it will
