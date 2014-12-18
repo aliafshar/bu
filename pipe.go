@@ -1,13 +1,14 @@
 package bu
 
 import (
+	"fmt"
+	"github.com/aliafshar/toylog"
 	"io"
 	"os/exec"
-
-	"github.com/aliafshar/toylog"
 )
 
 type pipe struct {
+	desc string
 	cmds []*exec.Cmd
 }
 
@@ -42,12 +43,35 @@ func (p *pipe) run() *result {
 	return combinedResult(rs)
 }
 
+func descTarget(t *target) string {
+	return fmt.Sprintf("%q", t.body)
+}
+
+func combinedResult(rs []*result) *result {
+	r := &result{}
+	for i, rr := range rs {
+		if i > 0 {
+			r.desc = r.desc + " | "
+		}
+		if rr.err != nil {
+			r.err = rr.err
+			r.desc = r.desc + fmt.Sprintf("%v", r.err)
+		} else {
+			r.desc = r.desc + "0"
+		}
+	}
+	return r
+}
+
 func newPipe(r *runtime, t *target) *pipe {
 	fst := t.cmd(r)
 	fst.Stdin = t.redirect.in()
 	p := &pipe{cmds: []*exec.Cmd{fst}}
+	p.desc = descTarget(t)
 	for _, d := range t.pipe {
-		p.cmds = append(p.cmds, d.resolve(r).cmd(r))
+		s := d.resolve(r)
+		p.cmds = append(p.cmds, s.cmd(r))
+		p.desc = p.desc + " | " + descTarget(s)
 	}
 	p.connect(t.redirect.out())
 	return p

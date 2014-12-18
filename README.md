@@ -1,3 +1,9 @@
+```
+┏━ ┃ ┃
+┏━┃┃ ┃
+━━ ━━┛
+```
+
 Bu is a tool to help you run common tasks. It is something like a simple version
 of GNU make with some additional features. You define a set of tasks and it will
 run them. It features: **targets with dependencies**, **script imports**,
@@ -134,26 +140,6 @@ and this invocation:
 
     $ bu demo FirstArgument
 
-# Questions
-
-```bu
-danger ? n
-  Are you sure? (y/n)
-
-demo: danger
-  if [ $danger -eq y ]; then
-    echo Confirmed, continuing
-  fi
-```
-
-Will prompt the user on the command line and store the value in the variable
-`confirm` with a default value of `n`. Questions are targets and can be depended
-on by other targets.
-
-Default values are optional, with the syntax:
-
-    <name> ? [default]
-        <question>
 
 # Imports
 

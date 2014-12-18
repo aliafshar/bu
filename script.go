@@ -1,19 +1,20 @@
 package bu
 
 import (
-	"fmt"
+	"github.com/aliafshar/toylog"
 	"os"
 	"path/filepath"
 )
 
 type script struct {
-	parser  *parser
-	modules []*module
-	module  *module
-	setvars []*setvar
-	path    []string
-	args    []string
-	targets map[string]*target
+	parser   *parser
+	modules  []*module
+	module   *module
+	setvars  []*setvar
+	path     []string
+	args     []string
+	targets  map[string]*target
+	filename string
 }
 
 type module struct {
@@ -81,15 +82,16 @@ func (s *script) aggregate() {
 
 func Load(filename string, args ...string) (*script, error) {
 	s := newScript()
+	s.filename = filename
 	s.args = args
 	m, err := s.loadFile(filename)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	for _, imp := range m.imports {
 		path := s.resolveModule(imp.key)
 		if path == "" {
-			fmt.Println("Error, unable to resolve module")
+			toylog.Errorf("unable to resolve module %q", imp.key)
 			continue
 		}
 		s.loadFile(path)

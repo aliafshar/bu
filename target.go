@@ -17,16 +17,3 @@ type result struct {
 func (r *result) success() bool {
 	return r.err == nil
 }
-
-func combinedResult(rs []*result) *result {
-	r := &result{}
-	for _, rr := range rs {
-		if rr.err != nil {
-			r.err = rr.err
-			r.desc = r.desc + " 1"
-		} else {
-			r.desc = r.desc + " 0"
-		}
-	}
-	return r
-}

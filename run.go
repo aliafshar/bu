@@ -1,6 +1,7 @@
 package bu
 
 import (
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -74,15 +75,19 @@ func (w *worker) start() {
 	w.rt.wait.Done()
 }
 
+func targetDesc(t *target, r *runtime) string {
+	return fmt.Sprintf("%v:%v", r.script.filename, t.name)
+}
+
 func (w *worker) run(t *target) *result {
-	toylog.Infof("> [%v] %v", t.name, t.name)
 	p := newPipe(w.rt, t)
+	toylog.Infof("> [%v] %v", targetDesc(t, w.rt), p.desc)
 	res := p.run()
 	if !res.success() {
-		toylog.Errorf("< [%v] fail %v %v", t.name, res.desc, res.err)
+		toylog.Errorf("< [%v] fail %v", targetDesc(t, w.rt), res.desc)
 		return res
 	}
-	toylog.Infof("< [%v] done %v", t.name, res.desc)
+	toylog.Infof("< [%v] done %v", targetDesc(t, w.rt), res.desc)
 	return res
 }
 

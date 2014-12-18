@@ -45,29 +45,27 @@ site: !py >index.html
 read: <index.html
   cat
 
+# empty targets do nothing, successfully.
 empty:
 
-some_py: !py <example.bu >outputfile.txt
+some_py: !py <example.bu >/tmp/outputfile.txt
   import sys
   print sys.stdin.read()
 
-'this is quoted':
+# names can be quoted to include spaces and other operators
+# bu 'this is quoted!!'
+'this is quoted!!':
   echo what??
 
+# counts characters from stdin
 count:
   wc -c
 
+# converts decimals to hex
 hex:
   wcalc -h
 
+# pipes its output to the count, then hex targets
 pipe: | count | hex
   echo piped
-
-e1:
-  export A=banana
-
-e2: e1
-  echo HOME 
-
-
-
+  echo banana
