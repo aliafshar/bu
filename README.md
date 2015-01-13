@@ -1,29 +1,12 @@
-```
-┏━ ┃ ┃
-┏━┃┃ ┃   version 0.0
-━━ ━━┛
+```logo```
 
-usage: bu [<flags>] [<target> [<args>]]
+Note: the full content of this document, with executed snippets is available at
+[in the documentation](http://aliafshar.github.io/bu)
 
-A build utility.
-
-Flags:
-  --help         Show help.
-  -f, --bufile=main.bu  Path to bu file.
-  -v, --version  Print the bu version and exit.
-  -d, --debug    Verbose logging.
-  -l, --list     List targets.
-
-Args:
-  [<target>]  Execute the named target.
-  [<args>]    Arguments to pass to the bu target.
-```
-
-Bu is a tool to help you run common tasks. It is something like a simple version
-of GNU make with some additional features. You define a set of tasks and it will
-run them. It features: **targets with dependencies**, **script imports**,
-**using Bash or Python**, **task parallelism**, **command line inputs**,
-and **variables**.
+Bu is a tool to help you run common tasks. It is something like Gulp that looks
+like Make. You define a set of tasks and it will run them. It features:
+**targets with dependencies**, **script imports**, **using Bash or Python**,
+**task parallelism**, **command line inputs**, and **variables**.
 
 Here is a tiny example.
 
@@ -36,10 +19,20 @@ The target is executed with:
 
     $ bu demo
 
+Or since it is the first target, simply:
+
+    $ bu
+
+# Usage
+
+```usage```
+
 # Targets
 
+Targets are the unit of work. They support a number of options.
+
 ```bu-spec
-<target name>: [dependencies...] [!type] 
+<target name>: [target dependencies...] [?file dependencies] [!type] [>outfile] [<infile] [|pipe]
   <script body>
 ```
 
@@ -61,13 +54,36 @@ shell command `go run cmd/bu.go`.
 Currently only shell and python are supported. Shell is the default, so no type
 is required to be passed explicitly. For a Python target, add the type.
 
+## Indentation
+
+Target bodies must be indented by any whitespace, tab or space. Indentation must
+be consistent for Python scripts since Python is sensitive to this.
+
 ```bu
 demo: !py
   for i in range(5):
     print i
 ```
 
-## Redirects
+# Dependencies
+
+## File Dependencies
+
+A target may explicitly depend on the existence of a file or directory.
+
+```bu
+make:
+  echo Blah > my_file.txt
+
+demo: make ?my_file.txt
+  cat my_file.txt
+  rm my_file.txt
+```
+
+# Pipes
+
+
+# Redirects
 
 Target output can be redirected to a file. This is useful when using shells that
 don't have redirection, like Python.
@@ -88,26 +104,11 @@ demo: <my_file.txt !py
   print sys.stdin.read()
 ```
 
-## File Dependencies
-
-A target may explicitly depend on the existence of a file or directory.
-
-```bu
-make:
-  echo Blah > my_file.txt
-
-demo: make ?my_file.txt
-  cat my_file.txt
-  rm my_file.txt
-```
-
-## Indentation
-
-Target bodies must be indented by any whitespace, tab or space. Indentation must
-be consistent for Python scripts since Python is sensitive to this.
 
 # Variables
 
+Bu does not have variables of it's own. Only environment variables are supported.
+These are passed to all targets.
 
 Single line variables are defined with the `=` operator, like so:
 
@@ -118,7 +119,7 @@ demo:
   echo $DEMO
 ```
 
-Multiline variables are defined exactly the same way in a block.
+Multiline variables are defined exactly the same way in an indented block.
 
 ```bu
 DEMO =
@@ -157,6 +158,10 @@ and this invocation:
 
 
 # Imports
+
+```bu-spec
+< <filepath>
+```
 
     < foo.bu
 
