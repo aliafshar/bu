@@ -1,7 +1,7 @@
 ```
-22:43 I ┏━ ┃ ┃  
-22:43 I ┏━┃┃ ┃   bu, version 0.0
-22:43 I ━━ ━━┛  
+15:31 I ┏━ ┃ ┃  
+15:31 I ┏━┃┃ ┃   bu, version 0.0
+15:31 I ━━ ━━┛  
 
 ```
 
@@ -21,9 +21,9 @@ demo:
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpIuyjiy:demo] "echo Hello, world!"
+15:31 I ●(cyan) [/tmp/tmpDC6ZXz:demo] "echo Hello, world!"
 Hello, world!
-22:43 I ●(green) 0 [/tmp/tmpIuyjiy:demo]
+15:31 I ●(green) 0 [/tmp/tmpDC6ZXz:demo]
 
 ```
 
@@ -76,12 +76,12 @@ build:
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpWDWqIx:build] "echo a dependency"
+15:31 I ●(cyan) [/tmp/tmpz9HfLn:build] "echo a dependency"
 a dependency
-22:43 I ●(green) 0 [/tmp/tmpWDWqIx:build]
-22:43 I ●(green) [/tmp/tmpWDWqIx:demo] "echo Hello, world!"
+15:31 I ●(green) 0 [/tmp/tmpz9HfLn:build]
+15:31 I ●(cyan) [/tmp/tmpz9HfLn:demo] "echo Hello, world!"
 Hello, world!
-22:43 I ●(green) 0 [/tmp/tmpWDWqIx:demo]
+15:31 I ●(green) 0 [/tmp/tmpz9HfLn:demo]
 
 ```
 
@@ -105,13 +105,13 @@ demo: !py
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmp98sosT:demo] "for i in range(5):\n  print i"
+15:31 I ●(cyan) [/tmp/tmpbDUxnp:demo] "for i in range(5):\n  print i"
 0
 1
 2
 3
 4
-22:43 I ●(green) 0 [/tmp/tmp98sosT:demo]
+15:31 I ●(green) 0 [/tmp/tmpbDUxnp:demo]
 
 ```
 
@@ -131,16 +131,55 @@ demo: make ?my_file.txt
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpzbz27M:make] "echo Blah > my_file.txt"
-22:43 I ●(green) 0 [/tmp/tmpzbz27M:make]
-22:43 I ●(green) [/tmp/tmpzbz27M:demo] "cat my_file.txt\nrm my_file.txt"
+15:31 I ●(cyan) [/tmp/tmp58oTnV:make] "echo Blah > my_file.txt"
+15:31 I ●(green) 0 [/tmp/tmp58oTnV:make]
+15:31 I ●(cyan) [/tmp/tmp58oTnV:demo] "cat my_file.txt\nrm my_file.txt"
 Blah
-22:43 I ●(green) 0 [/tmp/tmpzbz27M:demo]
+15:31 I ●(green) 0 [/tmp/tmp58oTnV:demo]
 
 ```
 
 # Pipes
 
+Targets can be piped into eachother.
+
+```bu
+count:
+  wc -c
+
+hex:
+  wcalc -h
+
+demo: | count | hex
+  echo piped
+  echo banana
+```
+
+```bu-out
+15:31 I ●(cyan) [/tmp/tmpKiPs7g:demo] "echo piped\necho banana" | "wc -c" | "wcalc -h"
+ = 0xd
+15:31 I ●(green) 0 | 0 | 0 [/tmp/tmpKiPs7g:demo]
+
+```
+
+Here the output of the `pipe` target is piped into the count target and then the
+hex target. Of course, all dependencies will be first run.
+
+# Watches
+
+Targets can be restarted based on watching a file for modification. This is
+probably only useful for long-running targets.
+
+```
+a_dep:
+  echo hello
+
+demo: a_dep ^example.bu
+  sleep 5
+```
+
+Will restart the `watch` target every time `example.bu` file is modified. It
+will handle stopping the running process.
 
 # Redirects
 
@@ -153,8 +192,8 @@ demo: >my_file.txt !py
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpSOwlLI:demo] "print \"Save me in a file\""
-22:43 I ●(green) 0 [/tmp/tmpSOwlLI:demo]
+15:31 I ●(cyan) [/tmp/tmpDKa_kD:demo] "print \"Save me in a file\""
+15:31 I ●(green) 0 [/tmp/tmpDKa_kD:demo]
 
 ```
 
@@ -170,10 +209,10 @@ demo: <my_file.txt !py
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmp5IKUw0:demo] "import sys\nprint sys.stdin.read()"
+15:31 I ●(cyan) [/tmp/tmpQEUT7_:demo] "import sys\nprint sys.stdin.read()"
 Save me in a file
 
-22:43 I ●(green) 0 [/tmp/tmp5IKUw0:demo]
+15:31 I ●(green) 0 [/tmp/tmpQEUT7_:demo]
 
 ```
 
@@ -193,9 +232,9 @@ demo:
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpzGWv1X:demo] "echo $DEMO"
+15:31 I ●(cyan) [/tmp/tmpO2mt4O:demo] "echo $DEMO"
 I am the variable content
-22:43 I ●(green) 0 [/tmp/tmpzGWv1X:demo]
+15:31 I ●(green) 0 [/tmp/tmpO2mt4O:demo]
 
 ```
 
@@ -213,12 +252,12 @@ demo:
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpe1KJ2n:demo] "echo \"$DEMO\""
+15:31 I ●(cyan) [/tmp/tmpoeXNbV:demo] "echo \"$DEMO\""
 I
 am
 the variable
 content
-22:43 I ●(green) 0 [/tmp/tmpe1KJ2n:demo]
+15:31 I ●(green) 0 [/tmp/tmpoeXNbV:demo]
 
 ```
 
@@ -243,9 +282,9 @@ demo:
 ```
 
 ```bu-out
-22:43 I ●(green) [/tmp/tmpZmuYK1:demo] "echo Hi, \"$0\""
+15:31 I ●(cyan) [/tmp/tmpmoUUPh:demo] "echo Hi, \"$0\""
 Hi, demo
-22:43 I ●(green) 0 [/tmp/tmpZmuYK1:demo]
+15:31 I ●(green) 0 [/tmp/tmpmoUUPh:demo]
 
 ```
 
