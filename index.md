@@ -1,8 +1,17 @@
-Bu is a tool to help you run common tasks. It is something like a simple version
-of GNU make with some additional features. You define a set of tasks and it will
-run them. It features: **targets with dependencies**, **script imports**,
-**using Bash or Python**, **task parallelism**, **command line inputs**,
-and **variables**.
+```
+22:43 I ┏━ ┃ ┃  
+22:43 I ┏━┃┃ ┃   bu, version 0.0
+22:43 I ━━ ━━┛  
+
+```
+
+Note: the full content of this document, with executed snippets is available at
+[in the documentation](http://aliafshar.github.io/bu)
+
+Bu is a tool to help you run common tasks. It is something like Gulp that looks
+like Make. You define a set of tasks and it will run them. It features:
+**targets with dependencies**, **script imports**, **using Bash or Python**,
+**task parallelism**, **command line inputs**, and **variables**.
 
 Here is a tiny example.
 
@@ -12,10 +21,9 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpZnzeCd"
-I: > [demo] !bash "echo Hello, world!"
+22:43 I ●(green) [/tmp/tmpIuyjiy:demo] "echo Hello, world!"
 Hello, world!
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmpIuyjiy:demo]
 
 ```
 
@@ -23,10 +31,37 @@ The target is executed with:
 
     $ bu demo
 
+Or since it is the first target, simply:
+
+    $ bu
+
+# Usage
+
+```
+usage: bu [<flags>] [<target> [<args>]]
+
+A build utility.
+
+Flags:
+  --help         Show help.
+  -f, --bufile=main.bu  Path to bu file.
+  -v, --version  Print the bu version and exit.
+  -d, --debug    Verbose logging.
+  -l, --list     List targets.
+  -q, --quiet    Don't be so noisy.
+
+Args:
+  [<target>]  Execute the named target.
+  [<args>]    Arguments to pass to the bu target.
+
+```
+
 # Targets
 
+Targets are the unit of work. They support a number of options.
+
 ```bu-spec
-<target name>: [dependencies...] [!type] 
+<target name>: [target dependencies...] [?file dependencies] [!type] [>outfile] [<infile] [|pipe]
   <script body>
 ```
 
@@ -41,13 +76,12 @@ build:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpQp3cI2"
-I: > [build] !bash "echo a dependency"
+22:43 I ●(green) [/tmp/tmpWDWqIx:build] "echo a dependency"
 a dependency
-I: < [build] done 0
-I: > [demo] !bash "echo Hello, world!"
+22:43 I ●(green) 0 [/tmp/tmpWDWqIx:build]
+22:43 I ●(green) [/tmp/tmpWDWqIx:demo] "echo Hello, world!"
 Hello, world!
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmpWDWqIx:demo]
 
 ```
 
@@ -59,6 +93,11 @@ shell command `go run cmd/bu.go`.
 Currently only shell and python are supported. Shell is the default, so no type
 is required to be passed explicitly. For a Python target, add the type.
 
+## Indentation
+
+Target bodies must be indented by any whitespace, tab or space. Indentation must
+be consistent for Python scripts since Python is sensitive to this.
+
 ```bu
 demo: !py
   for i in range(5):
@@ -66,53 +105,17 @@ demo: !py
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpM10VZ0"
-I: > [demo] !python "for i in range(5):\n  print i"
+22:43 I ●(green) [/tmp/tmp98sosT:demo] "for i in range(5):\n  print i"
 0
 1
 2
 3
 4
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmp98sosT:demo]
 
 ```
 
-## Redirects
-
-Target output can be redirected to a file. This is useful when using shells that
-don't have redirection, like Python.
-
-```bu
-demo: >my_file.txt !py
-  print "Save me in a file"
-```
-
-```bu-out
-I: bu, version 0.0, loading "/tmp/tmpuU_c80"
-I: > [demo] !python "print \"Save me in a file\""
-I: < [demo] done 0
-
-```
-
-Similarly a file can be used for input on standard input.
-
-```bu
-make: >my_file.txt
-  print "Save me in a file"
-
-demo: <my_file.txt !py
-  import sys
-  print sys.stdin.read()
-```
-
-```bu-out
-I: bu, version 0.0, loading "/tmp/tmpl6D3eq"
-I: > [demo] !python "import sys\nprint sys.stdin.read()"
-Save me in a file
-
-I: < [demo] done 0
-
-```
+# Dependencies
 
 ## File Dependencies
 
@@ -128,22 +131,57 @@ demo: make ?my_file.txt
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmp3chT1J"
-I: > [make] !bash "echo Blah > my_file.txt"
-I: < [make] done 0
-I: > [demo] !bash "cat my_file.txt\nrm my_file.txt"
+22:43 I ●(green) [/tmp/tmpzbz27M:make] "echo Blah > my_file.txt"
+22:43 I ●(green) 0 [/tmp/tmpzbz27M:make]
+22:43 I ●(green) [/tmp/tmpzbz27M:demo] "cat my_file.txt\nrm my_file.txt"
 Blah
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmpzbz27M:demo]
 
 ```
 
-## Indentation
+# Pipes
 
-Target bodies must be indented by any whitespace, tab or space. Indentation must
-be consistent for Python scripts since Python is sensitive to this.
+
+# Redirects
+
+Target output can be redirected to a file. This is useful when using shells that
+don't have redirection, like Python.
+
+```bu
+demo: >my_file.txt !py
+  print "Save me in a file"
+```
+
+```bu-out
+22:43 I ●(green) [/tmp/tmpSOwlLI:demo] "print \"Save me in a file\""
+22:43 I ●(green) 0 [/tmp/tmpSOwlLI:demo]
+
+```
+
+Similarly a file can be used for input on standard input.
+
+```bu
+make: >my_file.txt
+  print "Save me in a file"
+
+demo: <my_file.txt !py
+  import sys
+  print sys.stdin.read()
+```
+
+```bu-out
+22:43 I ●(green) [/tmp/tmp5IKUw0:demo] "import sys\nprint sys.stdin.read()"
+Save me in a file
+
+22:43 I ●(green) 0 [/tmp/tmp5IKUw0:demo]
+
+```
+
 
 # Variables
 
+Bu does not have variables of it's own. Only environment variables are supported.
+These are passed to all targets.
 
 Single line variables are defined with the `=` operator, like so:
 
@@ -155,14 +193,13 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpK854ek"
-I: > [demo] !bash "echo $DEMO"
+22:43 I ●(green) [/tmp/tmpzGWv1X:demo] "echo $DEMO"
 I am the variable content
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmpzGWv1X:demo]
 
 ```
 
-Multiline variables are defined exactly the same way in a block.
+Multiline variables are defined exactly the same way in an indented block.
 
 ```bu
 DEMO =
@@ -176,13 +213,12 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpwOMnUc"
-I: > [demo] !bash "echo \"$DEMO\""
+22:43 I ●(green) [/tmp/tmpe1KJ2n:demo] "echo \"$DEMO\""
 I
 am
 the variable
 content
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmpe1KJ2n:demo]
 
 ```
 
@@ -207,10 +243,9 @@ demo:
 ```
 
 ```bu-out
-I: bu, version 0.0, loading "/tmp/tmpnopzvg"
-I: > [demo] !bash "echo Hi, \"$0\""
+22:43 I ●(green) [/tmp/tmpZmuYK1:demo] "echo Hi, \"$0\""
 Hi, demo
-I: < [demo] done 0
+22:43 I ●(green) 0 [/tmp/tmpZmuYK1:demo]
 
 ```
 
@@ -218,38 +253,12 @@ and this invocation:
 
     $ bu demo FirstArgument
 
-# Questions
-
-```bu
-danger ? n
-  Are you sure? (y/n)
-
-demo: danger
-  if [ $danger -eq y ]; then
-    echo Confirmed, continuing
-  fi
-```
-
-```bu-out
-I: bu, version 0.0, loading "/tmp/tmp8buOe7"
-I: > [danger] question
-[1mAre you sure? (y/n)[0m (default=[1m[34mn[0m[0m) > E: < [danger] fail EOF
-I: > [demo] !bash "if [ $danger -eq y ]; then\n  echo Confirmed, continuing\nfi"
-demo: line 0: [: -eq: unary operator expected
-I: < [demo] done 0
-
-```
-
-Will prompt the user on the command line and store the value in the variable
-`confirm` with a default value of `n`. Questions are targets and can be depended
-on by other targets.
-
-Default values are optional, with the syntax:
-
-    <name> ? [default]
-        <question>
 
 # Imports
+
+```bu-spec
+< <filepath>
+```
 
     < foo.bu
 

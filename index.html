@@ -62,13 +62,31 @@ pre .code-input {
 font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
   }
 
+h1 pre {
+  line-height: normal;
+  margin: 0;
+  padding: 0;
+}
+
+        footer div.fixed {
+          font-family: monospace;
+            line-height: normal;
+              font-weight: bold;
+              font-size: 14px;
+                  display: block;
+        }
+
+
     </style>
   </head>
   <body>
     <header class="app-bar promote-layer">
       <div class="app-bar-container">
         <button class="menu"><img src="images/hamburger.svg" alt="Menu"></button>
-        <h1 class="logo"><strong>𝄽 bu</strong>ild utility</h1>
+        <h1 class="logo" style="margin-top: 16px">
+          <strong>𝄽 bu</strong>, a build system</h1>
+
+          </h1>
         <section class="app-bar-actions">
         <!-- Put App Bar Buttons Here -->
         <!-- e.g <button><i class="icon icon-star"></i></button> -->
@@ -81,9 +99,12 @@ font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
 
 
           <ul class="incremental">
+    <li><a href="#usage">Usage</a></li>
     <li><a href="#targets">Targets</a></li>
+    <li><a href="#dependencies">Dependencies</a></li>
+    <li><a href="#pipes">Pipes</a></li>
+    <li><a href="#redirects">Redirects</a></li>
     <li><a href="#variables">Variables</a></li>
-    <li><a href="#questions">Questions</a></li>
     <li><a href="#imports">Imports</a></li>
     <li><a href="#comments">Comments</a></li>
     <li><a href="#prologue">Prologue</a></li>
@@ -106,19 +127,43 @@ font-family: 'Roboto Condensed',Helvetica,Arial,sans-serif;
 
 
 
-<p>Bu is a tool to help you run common tasks. It is something like a simple version of GNU make with some additional features. You define a set of tasks and it will run them. It features: <strong>targets with dependencies</strong>, <strong>script imports</strong>, <strong>using Bash or Python</strong>, <strong>task parallelism</strong>, <strong>command line inputs</strong>, and <strong>variables</strong>.</p>
+<pre><code>19:33 I ┏━ ┃ ┃  
+19:33 I ┏━┃┃ ┃   bu, version 0.0
+19:33 I ━━ ━━┛  
+</code></pre>
+<p>Note: the full content of this document, with executed snippets is available at <a href="http://aliafshar.github.io/bu">in the documentation</a></p>
+<p>Bu is a tool to help you run common tasks. It is something like Gulp that looks like Make. You define a set of tasks and it will run them. It features: <strong>targets with dependencies</strong>, <strong>script imports</strong>, <strong>using Bash or Python</strong>, <strong>task parallelism</strong>, <strong>command line inputs</strong>, and <strong>variables</strong>.</p>
 <p>Here is a tiny example.</p>
 <pre class="bu"><code>demo:
   echo Hello, world!</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpZnzeCd&quot;
-I: &gt; [demo] !bash &quot;echo Hello, world!&quot;
+<pre class="bu-out"><code>19:33 I &quot;echo Hello, world!&quot; [/tmp/tmpeQqkpg:demo]
 Hello, world!
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpeQqkpg:demo]
 </code></pre>
 <p>The target is executed with:</p>
 <pre><code>$ bu demo</code></pre>
+<p>Or since it is the first target, simply:</p>
+<pre><code>$ bu</code></pre>
+<h1 id="usage">Usage</h1>
+<pre><code>usage: bu [&lt;flags&gt;] [&lt;target&gt; [&lt;args&gt;]]
+
+A build utility.
+
+Flags:
+  --help         Show help.
+  -f, --bufile=main.bu  Path to bu file.
+  -v, --version  Print the bu version and exit.
+  -d, --debug    Verbose logging.
+  -l, --list     List targets.
+  -q, --quiet    Don&#39;t be so noisy.
+
+Args:
+  [&lt;target&gt;]  Execute the named target.
+  [&lt;args&gt;]    Arguments to pass to the bu target.
+</code></pre>
 <h1 id="targets">Targets</h1>
-<pre class="bu-spec"><code>&lt;target name&gt;: [dependencies...] [!type] 
+<p>Targets are the unit of work. They support a number of options.</p>
+<pre class="bu-spec"><code>&lt;target name&gt;: [target dependencies...] [?file dependencies] [!type] [&gt;outfile] [&lt;infile] [|pipe]
   &lt;script body&gt;</code></pre>
 <p>for example,</p>
 <pre class="bu"><code>demo: build
@@ -126,50 +171,30 @@ I: &lt; [demo] done 0
 
 build:
   echo a dependency</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpQp3cI2&quot;
-I: &gt; [build] !bash &quot;echo a dependency&quot;
+<pre class="bu-out"><code>19:33 I &quot;echo a dependency&quot; [/tmp/tmpCId6Ji:build]
 a dependency
-I: &lt; [build] done 0
-I: &gt; [demo] !bash &quot;echo Hello, world!&quot;
+19:33 I ●(green) 0 [/tmp/tmpCId6Ji:build]
+19:33 I &quot;echo Hello, world!&quot; [/tmp/tmpCId6Ji:demo]
 Hello, world!
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpCId6Ji:demo]
 </code></pre>
 <p>is a target named <code>run</code> that depends on a target named <code>build</code> that runs the shell command <code>go run cmd/bu.go</code>.</p>
 <h2 id="target-types">Target types</h2>
 <p>Currently only shell and python are supported. Shell is the default, so no type is required to be passed explicitly. For a Python target, add the type.</p>
+<h2 id="indentation">Indentation</h2>
+<p>Target bodies must be indented by any whitespace, tab or space. Indentation must be consistent for Python scripts since Python is sensitive to this.</p>
 <pre class="bu"><code>demo: !py
   for i in range(5):
     print i</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpM10VZ0&quot;
-I: &gt; [demo] !python &quot;for i in range(5):\n  print i&quot;
+<pre class="bu-out"><code>19:33 I &quot;for i in range(5):\n  print i&quot; [/tmp/tmpJBQi0A:demo]
 0
 1
 2
 3
 4
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpJBQi0A:demo]
 </code></pre>
-<h2 id="redirects">Redirects</h2>
-<p>Target output can be redirected to a file. This is useful when using shells that don't have redirection, like Python.</p>
-<pre class="bu"><code>demo: &gt;my_file.txt !py
-  print &quot;Save me in a file&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpuU_c80&quot;
-I: &gt; [demo] !python &quot;print \&quot;Save me in a file\&quot;&quot;
-I: &lt; [demo] done 0
-</code></pre>
-<p>Similarly a file can be used for input on standard input.</p>
-<pre class="bu"><code>make: &gt;my_file.txt
-  print &quot;Save me in a file&quot;
-
-demo: &lt;my_file.txt !py
-  import sys
-  print sys.stdin.read()</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpl6D3eq&quot;
-I: &gt; [demo] !python &quot;import sys\nprint sys.stdin.read()&quot;
-Save me in a file
-
-I: &lt; [demo] done 0
-</code></pre>
+<h1 id="dependencies">Dependencies</h1>
 <h2 id="file-dependencies">File Dependencies</h2>
 <p>A target may explicitly depend on the existence of a file or directory.</p>
 <pre class="bu"><code>make:
@@ -178,27 +203,44 @@ I: &lt; [demo] done 0
 demo: make ?my_file.txt
   cat my_file.txt
   rm my_file.txt</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp3chT1J&quot;
-I: &gt; [make] !bash &quot;echo Blah &gt; my_file.txt&quot;
-I: &lt; [make] done 0
-I: &gt; [demo] !bash &quot;cat my_file.txt\nrm my_file.txt&quot;
+<pre class="bu-out"><code>19:33 I &quot;echo Blah &gt; my_file.txt&quot; [/tmp/tmpQLYZWR:make]
+19:33 I ●(green) 0 [/tmp/tmpQLYZWR:make]
+19:33 I &quot;cat my_file.txt\nrm my_file.txt&quot; [/tmp/tmpQLYZWR:demo]
 Blah
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpQLYZWR:demo]
 </code></pre>
-<h2 id="indentation">Indentation</h2>
-<p>Target bodies must be indented by any whitespace, tab or space. Indentation must be consistent for Python scripts since Python is sensitive to this.</p>
+<h1 id="pipes">Pipes</h1>
+<h1 id="redirects">Redirects</h1>
+<p>Target output can be redirected to a file. This is useful when using shells that don't have redirection, like Python.</p>
+<pre class="bu"><code>demo: &gt;my_file.txt !py
+  print &quot;Save me in a file&quot;</code></pre>
+<pre class="bu-out"><code>19:33 I &quot;print \&quot;Save me in a file\&quot;&quot; [/tmp/tmpfVXw5k:demo]
+19:33 I ●(green) 0 [/tmp/tmpfVXw5k:demo]
+</code></pre>
+<p>Similarly a file can be used for input on standard input.</p>
+<pre class="bu"><code>make: &gt;my_file.txt
+  print &quot;Save me in a file&quot;
+
+demo: &lt;my_file.txt !py
+  import sys
+  print sys.stdin.read()</code></pre>
+<pre class="bu-out"><code>19:33 I &quot;import sys\nprint sys.stdin.read()&quot; [/tmp/tmpdRbbsv:demo]
+Save me in a file
+
+19:33 I ●(green) 0 [/tmp/tmpdRbbsv:demo]
+</code></pre>
 <h1 id="variables">Variables</h1>
+<p>Bu does not have variables of it's own. Only environment variables are supported. These are passed to all targets.</p>
 <p>Single line variables are defined with the <code>=</code> operator, like so:</p>
 <pre class="bu"><code>DEMO =I am the variable content
 
 demo:
   echo $DEMO</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpK854ek&quot;
-I: &gt; [demo] !bash &quot;echo $DEMO&quot;
+<pre class="bu-out"><code>19:33 I &quot;echo $DEMO&quot; [/tmp/tmpPxaJW6:demo]
 I am the variable content
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpPxaJW6:demo]
 </code></pre>
-<p>Multiline variables are defined exactly the same way in a block.</p>
+<p>Multiline variables are defined exactly the same way in an indented block.</p>
 <pre class="bu"><code>DEMO =
     I
     am
@@ -207,13 +249,12 @@ I: &lt; [demo] done 0
 
 demo:
   echo &quot;$DEMO&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpwOMnUc&quot;
-I: &gt; [demo] !bash &quot;echo \&quot;$DEMO\&quot;&quot;
+<pre class="bu-out"><code>19:33 I &quot;echo \&quot;$DEMO\&quot;&quot; [/tmp/tmpXZORDQ:demo]
 I
 am
 the variable
 content
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpXZORDQ:demo]
 </code></pre>
 <p>Defines a variable <code>myvariable</code>. Quoting is not required as the variable value is taken to the end of the line.</p>
 <p>Variables are injected into the environment, where they can be used directly in targets as <code>$myvariable</code> in shell, or <code>os.getenv('myvariable')</code> from Python.</p>
@@ -222,33 +263,14 @@ I: &lt; [demo] done 0
 <p><code>$0</code>, <code>$1</code>, <code>$*</code>, <code>$@</code> etc (in shell) and <code>sys.args</code> (in Python) are available as additional arguments passed to the bu invocation. Consider this target:</p>
 <pre class="bu"><code>demo:
   echo Hi, &quot;$0&quot;</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmpnopzvg&quot;
-I: &gt; [demo] !bash &quot;echo Hi, \&quot;$0\&quot;&quot;
+<pre class="bu-out"><code>19:33 I &quot;echo Hi, \&quot;$0\&quot;&quot; [/tmp/tmpwvFXYK:demo]
 Hi, demo
-I: &lt; [demo] done 0
+19:33 I ●(green) 0 [/tmp/tmpwvFXYK:demo]
 </code></pre>
 <p>and this invocation:</p>
 <pre><code>$ bu demo FirstArgument</code></pre>
-<h1 id="questions">Questions</h1>
-<pre class="bu"><code>danger ? n
-  Are you sure? (y/n)
-
-demo: danger
-  if [ $danger -eq y ]; then
-    echo Confirmed, continuing
-  fi</code></pre>
-<pre class="bu-out"><code>I: bu, version 0.0, loading &quot;/tmp/tmp8buOe7&quot;
-I: &gt; [danger] question
-[1mAre you sure? (y/n)[0m (default=[1m[34mn[0m[0m) &gt; E: &lt; [danger] fail EOF
-I: &gt; [demo] !bash &quot;if [ $danger -eq y ]; then\n  echo Confirmed, continuing\nfi&quot;
-demo: line 0: [: -eq: unary operator expected
-I: &lt; [demo] done 0
-</code></pre>
-<p>Will prompt the user on the command line and store the value in the variable <code>confirm</code> with a default value of <code>n</code>. Questions are targets and can be depended on by other targets.</p>
-<p>Default values are optional, with the syntax:</p>
-<pre><code>&lt;name&gt; ? [default]
-    &lt;question&gt;</code></pre>
 <h1 id="imports">Imports</h1>
+<pre class="bu-spec"><code>&lt; &lt;filepath&gt;</code></pre>
 <pre><code>&lt; foo.bu</code></pre>
 <p>Will import foo.bu from the system path, which defaults to resolving, in order:</p>
 <ul class="incremental">
@@ -271,6 +293,9 @@ I: &lt; [demo] done 0
 </main>
 
 <footer>
+<div class="fixed">┏━ ┃ ┃</div>  
+<div class="fixed">┏━┃┃ ┃</div>
+<div class="fixed">━━ ━━┛</div>
 </footer>
 
     <script src="scripts/main.js"></script>
@@ -307,3 +332,4 @@ I: &lt; [demo] done 0
     </script>
   </body>
 </html>
+banana
