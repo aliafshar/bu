@@ -9,11 +9,11 @@ func Run(bufile, targetName string, args ...string) {
 	s, _ := Load(bufile, args...)
 	r := newRuntime(s)
 	t := s.Target(targetName)
+  toylog.Debugf("target is: %+v\n", t)
 	if t == nil {
 		toylog.Fatalf("target not found %q", targetName)
 	}
-	r.build(t)
-	r.start()
+	r.run(t)
 }
 
 func List(bufile string) []string {

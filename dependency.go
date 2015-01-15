@@ -25,6 +25,24 @@ func (d *targetDependency) resolve(r *runtime) *target {
 	return r.script.Target(d.name)
 }
 
+type pipeDependency struct {
+  name string
+}
+
+func (d *pipeDependency) can(rt *runtime) bool {
+  t := rt.script.Target(d.name)
+  for _, d := range t.deps {
+    if !d.can(rt) {
+      return false
+    }
+  }
+  return true
+}
+
+func (d *pipeDependency) resolve(r *runtime) *target {
+	return nil
+}
+
 type fileDependency struct {
 	filename string
 }

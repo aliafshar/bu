@@ -2,6 +2,7 @@ package bu
 
 import (
 	"io"
+  "github.com/aliafshar/toylog"
 )
 
 type parser struct {
@@ -47,12 +48,17 @@ func (p *parser) createTarget(n *node) *target {
 			t.deps = append(t.deps, &fileDependency{filename: o.key})
 		case opPipe:
 			t.pipe = append(t.pipe, &targetDependency{name: o.key})
+			t.deps = append(t.deps, &pipeDependency{name: o.key})
 		case opAt:
 			t.deps = append(t.deps, &webDependency{uri: o.key})
 		case opRedirect:
 			t.redirect.ofile = o.key
 		case opImport:
 			t.redirect.ifile = o.key
+    case opCaret:
+      t.watch = o.key
+    default:
+      toylog.Debugf("unknown operator %+v\n", o)
 		}
 	}
 	return t

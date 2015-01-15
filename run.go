@@ -3,15 +3,27 @@ package bu
 import (
 	"fmt"
 	"os"
+  "os/exec"
 	"sync"
 	"time"
 
 	"github.com/aliafshar/toylog"
+	"github.com/mgutz/ansi"
+	"golang.org/x/crypto/ssh/terminal"
+)
+
+const (
+	feedbackChar = "●"
+	launchChar   = "▶"
 )
 
 type queue struct {
 	items []*target
 	sync.Mutex
+}
+
+func (q *queue) reset() {
+  q.items = nil
 }
 
 func (q *queue) peek() *target {
@@ -79,17 +91,35 @@ func targetDesc(t *target, r *runtime) string {
 	return fmt.Sprintf("%v:%v", r.script.filename, t.name)
 }
 
+func feedback(char, color string) string {
+	if terminal.IsTerminal(int(os.Stderr.Fd())) {
+		return ansi.Color(char, color+"+b")
+	} else {
+		return feedbackChar + "(" + color + ")"
+	}
+}
+
+
 func (w *worker) run(t *target) *result {
 	p := newPipe(w.rt, t)
-	toylog.Infof("> [%v] %v", targetDesc(t, w.rt), p.desc)
+	toylog.Infof("%v [%v] %v", feedback(launchChar, "cyan"), targetDesc(t, w.rt), p.desc)
 	res := p.run()
 	if !res.success() {
-		toylog.Errorf("< [%v] fail %v", targetDesc(t, w.rt), res.desc)
+		toylog.Errorf("%v %v [%v]",
+			feedback(feedbackChar, "red"),
+			res.desc,
+			targetDesc(t, w.rt),
+		)
 		return res
 	}
-	toylog.Infof("< [%v] done %v", targetDesc(t, w.rt), res.desc)
+	toylog.Infof("%v %v [%v]",
+		feedback(feedbackChar, "green"),
+		res.desc,
+		targetDesc(t, w.rt),
+	)
 	return res
 }
+
 
 func (w *worker) can(t *target) bool {
 	for _, d := range t.deps {
@@ -103,6 +133,10 @@ func (w *worker) can(t *target) bool {
 type history struct {
 	log map[string]bool
 	sync.Mutex
+}
+
+func (h *history) reset() {
+  h.log = make(map[string]bool)
 }
 
 func (h *history) do(key string) {
@@ -127,6 +161,7 @@ type runtime struct {
 	pool    *pool
 	queue   *queue
 	history *history
+  running map[int]*exec.Cmd
 	wait    *sync.WaitGroup
 	argv    []string
 	env     []string
@@ -150,6 +185,66 @@ func (r *runtime) build(t *target) {
 			r.build(u)
 		}
 	}
+  for _, p := range t.pipe {
+    u := p.resolve(r)
+    for _, d := range u.deps {
+      v := d.resolve(r)
+      if v != nil {
+        r.build(v)
+      }
+    }
+  }
+}
+
+func (r *runtime) reset() {
+  r.running = make(map[int]*exec.Cmd)
+  r.queue.reset()
+  r.history.reset()
+}
+
+func (r *runtime) stop() {
+	for _, cmd := range r.running {
+		cmd.Process.Kill()
+	}
+	for _, cmd := range r.running {
+		cmd.Wait()
+	}
+  r.reset()
+  r.wait.Wait()
+}
+
+func (r *runtime) run(t *target) {
+  if t.watch != "" {
+    r.runWatch(t)
+    return
+  }
+  r.runOnce(t)
+}
+
+func (r *runtime) runOnce(t *target) {
+  r.reset()
+  r.build(t)
+  r.start()
+}
+
+func (r *runtime) pollRestart(out chan bool) {
+  for {
+    select {
+    case _ = <-out:
+      r.stop()
+    }
+  }
+}
+
+func (r *runtime) runWatch(t *target) {
+  out := make(chan bool)
+  wt := &watcher{path: t.watch, out: out}
+  toylog.Debugf("running a watch %+v", wt)
+  go wt.watch()
+  go r.pollRestart(out)
+  for {
+    r.runOnce(t)
+  }
 }
 
 func newRuntime(script *script) *runtime {
@@ -166,5 +261,6 @@ func newRuntime(script *script) *runtime {
 		wait:    &sync.WaitGroup{},
 		queue:   &queue{},
 		env:     env,
+    running: make(map[int]*exec.Cmd),
 	}
 }
