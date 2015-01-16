@@ -1,7 +1,7 @@
 ```
-15:31 I ┏━ ┃ ┃  
-15:31 I ┏━┃┃ ┃   bu, version 0.0
-15:31 I ━━ ━━┛  
+22:11 I ┏━ ┃ ┃  
+22:11 I ┏━┃┃ ┃   bu, version 0.0
+22:11 I ━━ ━━┛  
 
 ```
 
@@ -21,9 +21,9 @@ demo:
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpDC6ZXz:demo] "echo Hello, world!"
+22:11 I ●(cyan) [/tmp/main.bu:demo] "echo Hello, world!"
 Hello, world!
-15:31 I ●(green) 0 [/tmp/tmpDC6ZXz:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -76,12 +76,12 @@ build:
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpz9HfLn:build] "echo a dependency"
+22:11 I ●(cyan) [/tmp/main.bu:build] "echo a dependency"
 a dependency
-15:31 I ●(green) 0 [/tmp/tmpz9HfLn:build]
-15:31 I ●(cyan) [/tmp/tmpz9HfLn:demo] "echo Hello, world!"
+22:11 I ●(green) 0 [/tmp/main.bu:build]
+22:11 I ●(cyan) [/tmp/main.bu:demo] "echo Hello, world!"
 Hello, world!
-15:31 I ●(green) 0 [/tmp/tmpz9HfLn:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -105,13 +105,13 @@ demo: !py
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpbDUxnp:demo] "for i in range(5):\n  print i"
+22:11 I ●(cyan) [/tmp/main.bu:demo] "for i in range(5):\n  print i"
 0
 1
 2
 3
 4
-15:31 I ●(green) 0 [/tmp/tmpbDUxnp:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -131,11 +131,11 @@ demo: make ?my_file.txt
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmp58oTnV:make] "echo Blah > my_file.txt"
-15:31 I ●(green) 0 [/tmp/tmp58oTnV:make]
-15:31 I ●(cyan) [/tmp/tmp58oTnV:demo] "cat my_file.txt\nrm my_file.txt"
+22:11 I ●(cyan) [/tmp/main.bu:make] "echo Blah > my_file.txt"
+22:11 I ●(green) 0 [/tmp/main.bu:make]
+22:11 I ●(cyan) [/tmp/main.bu:demo] "cat my_file.txt\nrm my_file.txt"
 Blah
-15:31 I ●(green) 0 [/tmp/tmp58oTnV:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -156,9 +156,9 @@ demo: | count | hex
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpKiPs7g:demo] "echo piped\necho banana" | "wc -c" | "wcalc -h"
+22:11 I ●(cyan) [/tmp/main.bu:demo] "echo piped\necho banana" | "wc -c" | "wcalc -h"
  = 0xd
-15:31 I ●(green) 0 | 0 | 0 [/tmp/tmpKiPs7g:demo]
+22:11 I ●(green) 0 | 0 | 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -192,8 +192,8 @@ demo: >my_file.txt !py
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpDKa_kD:demo] "print \"Save me in a file\""
-15:31 I ●(green) 0 [/tmp/tmpDKa_kD:demo]
+22:11 I ●(cyan) [/tmp/main.bu:demo] "print \"Save me in a file\""
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -209,10 +209,10 @@ demo: <my_file.txt !py
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpQEUT7_:demo] "import sys\nprint sys.stdin.read()"
+22:11 I ●(cyan) [/tmp/main.bu:demo] "import sys\nprint sys.stdin.read()"
 Save me in a file
 
-15:31 I ●(green) 0 [/tmp/tmpQEUT7_:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -232,9 +232,9 @@ demo:
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpO2mt4O:demo] "echo $DEMO"
+22:11 I ●(cyan) [/tmp/main.bu:demo] "echo $DEMO"
 I am the variable content
-15:31 I ●(green) 0 [/tmp/tmpO2mt4O:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -252,12 +252,12 @@ demo:
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpoeXNbV:demo] "echo \"$DEMO\""
+22:11 I ●(cyan) [/tmp/main.bu:demo] "echo \"$DEMO\""
 I
 am
 the variable
 content
-15:31 I ●(green) 0 [/tmp/tmpoeXNbV:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -282,9 +282,9 @@ demo:
 ```
 
 ```bu-out
-15:31 I ●(cyan) [/tmp/tmpmoUUPh:demo] "echo Hi, \"$0\""
+22:11 I ●(cyan) [/tmp/main.bu:demo] "echo Hi, \"$0\""
 Hi, demo
-15:31 I ●(green) 0 [/tmp/tmpmoUUPh:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 

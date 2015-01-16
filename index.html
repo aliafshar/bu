@@ -128,18 +128,18 @@ h1 pre {
 
 
 
-<pre><code>15:31 I ┏━ ┃ ┃  
-15:31 I ┏━┃┃ ┃   bu, version 0.0
-15:31 I ━━ ━━┛  
+<pre><code>22:11 I ┏━ ┃ ┃  
+22:11 I ┏━┃┃ ┃   bu, version 0.0
+22:11 I ━━ ━━┛  
 </code></pre>
 <p>Note: the full content of this document, with executed snippets is available at <a href="http://aliafshar.github.io/bu">in the documentation</a></p>
 <p>Bu is a tool to help you run common tasks. It is something like Gulp that looks like Make. You define a set of tasks and it will run them. It features: <strong>targets with dependencies</strong>, <strong>script imports</strong>, <strong>using Bash or Python</strong>, <strong>task parallelism</strong>, <strong>command line inputs</strong>, and <strong>variables</strong>.</p>
 <p>Here is a tiny example.</p>
 <pre class="bu"><code>demo:
   echo Hello, world!</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpDC6ZXz:demo] &quot;echo Hello, world!&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hello, world!&quot;
 Hello, world!
-15:31 I ●(green) 0 [/tmp/tmpDC6ZXz:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>The target is executed with:</p>
 <pre><code>$ bu demo</code></pre>
@@ -172,12 +172,12 @@ Args:
 
 build:
   echo a dependency</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpz9HfLn:build] &quot;echo a dependency&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:build] &quot;echo a dependency&quot;
 a dependency
-15:31 I ●(green) 0 [/tmp/tmpz9HfLn:build]
-15:31 I ●(cyan) [/tmp/tmpz9HfLn:demo] &quot;echo Hello, world!&quot;
+22:11 I ●(green) 0 [/tmp/main.bu:build]
+22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hello, world!&quot;
 Hello, world!
-15:31 I ●(green) 0 [/tmp/tmpz9HfLn:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>is a target named <code>run</code> that depends on a target named <code>build</code> that runs the shell command <code>go run cmd/bu.go</code>.</p>
 <h2 id="target-types">Target types</h2>
@@ -187,13 +187,13 @@ Hello, world!
 <pre class="bu"><code>demo: !py
   for i in range(5):
     print i</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpbDUxnp:demo] &quot;for i in range(5):\n  print i&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;for i in range(5):\n  print i&quot;
 0
 1
 2
 3
 4
-15:31 I ●(green) 0 [/tmp/tmpbDUxnp:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <h1 id="dependencies">Dependencies</h1>
 <h2 id="file-dependencies">File Dependencies</h2>
@@ -204,11 +204,11 @@ Hello, world!
 demo: make ?my_file.txt
   cat my_file.txt
   rm my_file.txt</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmp58oTnV:make] &quot;echo Blah &gt; my_file.txt&quot;
-15:31 I ●(green) 0 [/tmp/tmp58oTnV:make]
-15:31 I ●(cyan) [/tmp/tmp58oTnV:demo] &quot;cat my_file.txt\nrm my_file.txt&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:make] &quot;echo Blah &gt; my_file.txt&quot;
+22:11 I ●(green) 0 [/tmp/main.bu:make]
+22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;cat my_file.txt\nrm my_file.txt&quot;
 Blah
-15:31 I ●(green) 0 [/tmp/tmp58oTnV:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <h1 id="pipes">Pipes</h1>
 <p>Targets can be piped into eachother.</p>
@@ -221,9 +221,9 @@ hex:
 demo: | count | hex
   echo piped
   echo banana</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpKiPs7g:demo] &quot;echo piped\necho banana&quot; | &quot;wc -c&quot; | &quot;wcalc -h&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo piped\necho banana&quot; | &quot;wc -c&quot; | &quot;wcalc -h&quot;
  = 0xd
-15:31 I ●(green) 0 | 0 | 0 [/tmp/tmpKiPs7g:demo]
+22:11 I ●(green) 0 | 0 | 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>Here the output of the <code>pipe</code> target is piped into the count target and then the hex target. Of course, all dependencies will be first run.</p>
 <h1 id="watches">Watches</h1>
@@ -238,8 +238,8 @@ demo: a_dep ^example.bu
 <p>Target output can be redirected to a file. This is useful when using shells that don't have redirection, like Python.</p>
 <pre class="bu"><code>demo: &gt;my_file.txt !py
   print &quot;Save me in a file&quot;</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpDKa_kD:demo] &quot;print \&quot;Save me in a file\&quot;&quot;
-15:31 I ●(green) 0 [/tmp/tmpDKa_kD:demo]
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;print \&quot;Save me in a file\&quot;&quot;
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>Similarly a file can be used for input on standard input.</p>
 <pre class="bu"><code>make: &gt;my_file.txt
@@ -248,10 +248,10 @@ demo: a_dep ^example.bu
 demo: &lt;my_file.txt !py
   import sys
   print sys.stdin.read()</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpQEUT7_:demo] &quot;import sys\nprint sys.stdin.read()&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;import sys\nprint sys.stdin.read()&quot;
 Save me in a file
 
-15:31 I ●(green) 0 [/tmp/tmpQEUT7_:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <h1 id="variables">Variables</h1>
 <p>Bu does not have variables of it's own. Only environment variables are supported. These are passed to all targets.</p>
@@ -260,9 +260,9 @@ Save me in a file
 
 demo:
   echo $DEMO</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpO2mt4O:demo] &quot;echo $DEMO&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo $DEMO&quot;
 I am the variable content
-15:31 I ●(green) 0 [/tmp/tmpO2mt4O:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>Multiline variables are defined exactly the same way in an indented block.</p>
 <pre class="bu"><code>DEMO =
@@ -273,12 +273,12 @@ I am the variable content
 
 demo:
   echo &quot;$DEMO&quot;</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpoeXNbV:demo] &quot;echo \&quot;$DEMO\&quot;&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo \&quot;$DEMO\&quot;&quot;
 I
 am
 the variable
 content
-15:31 I ●(green) 0 [/tmp/tmpoeXNbV:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>Defines a variable <code>myvariable</code>. Quoting is not required as the variable value is taken to the end of the line.</p>
 <p>Variables are injected into the environment, where they can be used directly in targets as <code>$myvariable</code> in shell, or <code>os.getenv('myvariable')</code> from Python.</p>
@@ -287,9 +287,9 @@ content
 <p><code>$0</code>, <code>$1</code>, <code>$*</code>, <code>$@</code> etc (in shell) and <code>sys.args</code> (in Python) are available as additional arguments passed to the bu invocation. Consider this target:</p>
 <pre class="bu"><code>demo:
   echo Hi, &quot;$0&quot;</code></pre>
-<pre class="bu-out"><code>15:31 I ●(cyan) [/tmp/tmpmoUUPh:demo] &quot;echo Hi, \&quot;$0\&quot;&quot;
+<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hi, \&quot;$0\&quot;&quot;
 Hi, demo
-15:31 I ●(green) 0 [/tmp/tmpmoUUPh:demo]
+22:11 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>and this invocation:</p>
 <pre><code>$ bu demo FirstArgument</code></pre>
