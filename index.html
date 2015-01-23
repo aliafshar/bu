@@ -104,11 +104,6 @@ h1 pre {
     <li><a href="#dependencies">Dependencies</a></li>
     <li><a href="#pipes">Pipes</a></li>
     <li><a href="#watches">Watches</a></li>
-    <li><a href="#redirects">Redirects</a></li>
-    <li><a href="#variables">Variables</a></li>
-    <li><a href="#imports">Imports</a></li>
-    <li><a href="#comments">Comments</a></li>
-    <li><a href="#prologue">Prologue</a></li>
     </ul>
           </nav>
 
@@ -128,18 +123,18 @@ h1 pre {
 
 
 
-<pre><code>22:11 I ┏━ ┃ ┃  
-22:11 I ┏━┃┃ ┃   bu, version 0.0
-22:11 I ━━ ━━┛  
+<pre><code>22:16 I ┏━ ┃ ┃  
+22:16 I ┏━┃┃ ┃   bu, version 0.0
+22:16 I ━━ ━━┛  
 </code></pre>
 <p>Note: the full content of this document, with executed snippets is available at <a href="http://aliafshar.github.io/bu">in the documentation</a></p>
 <p>Bu is a tool to help you run common tasks. It is something like Gulp that looks like Make. You define a set of tasks and it will run them. It features: <strong>targets with dependencies</strong>, <strong>script imports</strong>, <strong>using Bash or Python</strong>, <strong>task parallelism</strong>, <strong>command line inputs</strong>, and <strong>variables</strong>.</p>
 <p>Here is a tiny example.</p>
 <pre class="bu"><code>demo:
   echo Hello, world!</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hello, world!&quot;
+<pre class="bu-out"><code>22:16 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hello, world!&quot;
 Hello, world!
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
+22:16 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>The target is executed with:</p>
 <pre><code>$ bu demo</code></pre>
@@ -172,12 +167,12 @@ Args:
 
 build:
   echo a dependency</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:build] &quot;echo a dependency&quot;
+<pre class="bu-out"><code>22:16 I ●(cyan) [/tmp/main.bu:build] &quot;echo a dependency&quot;
 a dependency
-22:11 I ●(green) 0 [/tmp/main.bu:build]
-22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hello, world!&quot;
+22:16 I ●(green) 0 [/tmp/main.bu:build]
+22:16 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hello, world!&quot;
 Hello, world!
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
+22:16 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>is a target named <code>run</code> that depends on a target named <code>build</code> that runs the shell command <code>go run cmd/bu.go</code>.</p>
 <h2 id="target-types">Target types</h2>
@@ -187,13 +182,13 @@ Hello, world!
 <pre class="bu"><code>demo: !py
   for i in range(5):
     print i</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;for i in range(5):\n  print i&quot;
+<pre class="bu-out"><code>22:16 I ●(cyan) [/tmp/main.bu:demo] &quot;for i in range(5):\n  print i&quot;
 0
 1
 2
 3
 4
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
+22:16 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <h1 id="dependencies">Dependencies</h1>
 <h2 id="file-dependencies">File Dependencies</h2>
@@ -204,11 +199,11 @@ Hello, world!
 demo: make ?my_file.txt
   cat my_file.txt
   rm my_file.txt</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:make] &quot;echo Blah &gt; my_file.txt&quot;
-22:11 I ●(green) 0 [/tmp/main.bu:make]
-22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;cat my_file.txt\nrm my_file.txt&quot;
+<pre class="bu-out"><code>22:16 I ●(cyan) [/tmp/main.bu:make] &quot;echo Blah &gt; my_file.txt&quot;
+22:16 I ●(green) 0 [/tmp/main.bu:make]
+22:16 I ●(cyan) [/tmp/main.bu:demo] &quot;cat my_file.txt\nrm my_file.txt&quot;
 Blah
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
+22:16 I ●(green) 0 [/tmp/main.bu:demo]
 </code></pre>
 <h1 id="pipes">Pipes</h1>
 <p>Targets can be piped into eachother.</p>
@@ -221,98 +216,19 @@ hex:
 demo: | count | hex
   echo piped
   echo banana</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo piped\necho banana&quot; | &quot;wc -c&quot; | &quot;wcalc -h&quot;
+<pre class="bu-out"><code>22:16 I ●(cyan) [/tmp/main.bu:demo] &quot;echo piped\necho banana&quot; | &quot;wc -c&quot; | &quot;wcalc -h&quot;
  = 0xd
-22:11 I ●(green) 0 | 0 | 0 [/tmp/main.bu:demo]
+22:16 I ●(green) 0 | 0 | 0 [/tmp/main.bu:demo]
 </code></pre>
 <p>Here the output of the <code>pipe</code> target is piped into the count target and then the hex target. Of course, all dependencies will be first run.</p>
 <h1 id="watches">Watches</h1>
 <p>Targets can be restarted based on watching a file for modification. This is probably only useful for long-running targets.</p>
-<pre><code>a_dep:
+<pre class="bu"><code>a_dep:
   echo hello
 
 demo: a_dep ^example.bu
   sleep 5</code></pre>
-<p>Will restart the <code>watch</code> target every time <code>example.bu</code> file is modified. It will handle stopping the running process.</p>
-<h1 id="redirects">Redirects</h1>
-<p>Target output can be redirected to a file. This is useful when using shells that don't have redirection, like Python.</p>
-<pre class="bu"><code>demo: &gt;my_file.txt !py
-  print &quot;Save me in a file&quot;</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;print \&quot;Save me in a file\&quot;&quot;
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
-</code></pre>
-<p>Similarly a file can be used for input on standard input.</p>
-<pre class="bu"><code>make: &gt;my_file.txt
-  print &quot;Save me in a file&quot;
-
-demo: &lt;my_file.txt !py
-  import sys
-  print sys.stdin.read()</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;import sys\nprint sys.stdin.read()&quot;
-Save me in a file
-
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
-</code></pre>
-<h1 id="variables">Variables</h1>
-<p>Bu does not have variables of it's own. Only environment variables are supported. These are passed to all targets.</p>
-<p>Single line variables are defined with the <code>=</code> operator, like so:</p>
-<pre class="bu"><code>DEMO =I am the variable content
-
-demo:
-  echo $DEMO</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo $DEMO&quot;
-I am the variable content
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
-</code></pre>
-<p>Multiline variables are defined exactly the same way in an indented block.</p>
-<pre class="bu"><code>DEMO =
-    I
-    am
-    the variable
-    content
-
-demo:
-  echo &quot;$DEMO&quot;</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo \&quot;$DEMO\&quot;&quot;
-I
-am
-the variable
-content
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
-</code></pre>
-<p>Defines a variable <code>myvariable</code>. Quoting is not required as the variable value is taken to the end of the line.</p>
-<p>Variables are injected into the environment, where they can be used directly in targets as <code>$myvariable</code> in shell, or <code>os.getenv('myvariable')</code> from Python.</p>
-<p>Note: Because variables are injected only into the environment, they will not be used in target names and dependencies.</p>
-<h2 id="positional-arguments">Positional arguments</h2>
-<p><code>$0</code>, <code>$1</code>, <code>$*</code>, <code>$@</code> etc (in shell) and <code>sys.args</code> (in Python) are available as additional arguments passed to the bu invocation. Consider this target:</p>
-<pre class="bu"><code>demo:
-  echo Hi, &quot;$0&quot;</code></pre>
-<pre class="bu-out"><code>22:11 I ●(cyan) [/tmp/main.bu:demo] &quot;echo Hi, \&quot;$0\&quot;&quot;
-Hi, demo
-22:11 I ●(green) 0 [/tmp/main.bu:demo]
-</code></pre>
-<p>and this invocation:</p>
-<pre><code>$ bu demo FirstArgument</code></pre>
-<h1 id="imports">Imports</h1>
-<pre class="bu-spec"><code>&lt; &lt;filepath&gt;</code></pre>
-<pre><code>&lt; foo.bu</code></pre>
-<p>Will import foo.bu from the system path, which defaults to resolving, in order:</p>
-<ul class="incremental">
-<li>Current working directory <code>.</code></li>
-<li>Bu home directory <code>~/.bu</code></li>
-</ul>
-<h1 id="comments">Comments</h1>
-<p>Line comments only. Non-line comments are undefined, especially in situations where values are taken to the end of a line, e.g. variable definitions</p>
-<pre><code>myvariable = I am the value # this comment will be part of the value</code></pre>
-<h2 id="differences-from-gnu-make">Differences from GNU make</h2>
-<ul class="incremental">
-<li>Each target is executed in the same shell</li>
-<li>File existence is not explicitly taken to imply a dependency satisfaction</li>
-</ul>
-<h1 id="prologue">Prologue</h1>
-<p>To you, designers and engineers of build systems, I present Bu.</p>
-<p>For years I have suffered your hideous constructs, your crushing assumptions, and your bizarre choices. The only revenge left to me is to build one that is worse, more disgusting, and infinitely heavier with dripping abomination, so that you may suffer the pain that I have suffered. Feel the gut-wrenching taste of bile in my mouth. Feel it, and let it sour the flavor of your day, your week and your month. May it lay barren the fields of your productivity.</p>
-<p><strong>To you, designers and engineers of build systems, I present Bu!</strong></p>
+<p>```bu-out</p>
 
 </main>
 
