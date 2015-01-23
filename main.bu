@@ -30,7 +30,7 @@ site_clone:
 fmt: >test.test
   gofmt -w *.go */*.go
 
-docs_samples: !py
+docs_samples: !py >site/index.md
   import subprocess, os, sys
   f = open(os.getenv('readme'))
   o = False
