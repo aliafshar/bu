@@ -1,7 +1,7 @@
 ```
-22:16 I ┏━ ┃ ┃  
-22:16 I ┏━┃┃ ┃   bu, version 0.0
-22:16 I ━━ ━━┛  
+22:19 I ┏━ ┃ ┃  
+22:19 I ┏━┃┃ ┃   bu, version 0.0
+22:19 I ━━ ━━┛  
 
 ```
 
@@ -21,9 +21,9 @@ demo:
 ```
 
 ```bu-out
-22:16 I ●(cyan) [/tmp/main.bu:demo] "echo Hello, world!"
+22:19 I ●(cyan) [/tmp/main.bu:demo] "echo Hello, world!"
 Hello, world!
-22:16 I ●(green) 0 [/tmp/main.bu:demo]
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -76,12 +76,12 @@ build:
 ```
 
 ```bu-out
-22:16 I ●(cyan) [/tmp/main.bu:build] "echo a dependency"
+22:19 I ●(cyan) [/tmp/main.bu:build] "echo a dependency"
 a dependency
-22:16 I ●(green) 0 [/tmp/main.bu:build]
-22:16 I ●(cyan) [/tmp/main.bu:demo] "echo Hello, world!"
+22:19 I ●(green) 0 [/tmp/main.bu:build]
+22:19 I ●(cyan) [/tmp/main.bu:demo] "echo Hello, world!"
 Hello, world!
-22:16 I ●(green) 0 [/tmp/main.bu:demo]
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -105,13 +105,13 @@ demo: !py
 ```
 
 ```bu-out
-22:16 I ●(cyan) [/tmp/main.bu:demo] "for i in range(5):\n  print i"
+22:19 I ●(cyan) [/tmp/main.bu:demo] "for i in range(5):\n  print i"
 0
 1
 2
 3
 4
-22:16 I ●(green) 0 [/tmp/main.bu:demo]
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -131,11 +131,11 @@ demo: make ?my_file.txt
 ```
 
 ```bu-out
-22:16 I ●(cyan) [/tmp/main.bu:make] "echo Blah > my_file.txt"
-22:16 I ●(green) 0 [/tmp/main.bu:make]
-22:16 I ●(cyan) [/tmp/main.bu:demo] "cat my_file.txt\nrm my_file.txt"
+22:19 I ●(cyan) [/tmp/main.bu:make] "echo Blah > my_file.txt"
+22:19 I ●(green) 0 [/tmp/main.bu:make]
+22:19 I ●(cyan) [/tmp/main.bu:demo] "cat my_file.txt\nrm my_file.txt"
 Blah
-22:16 I ●(green) 0 [/tmp/main.bu:demo]
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -156,9 +156,9 @@ demo: | count | hex
 ```
 
 ```bu-out
-22:16 I ●(cyan) [/tmp/main.bu:demo] "echo piped\necho banana" | "wc -c" | "wcalc -h"
+22:19 I ●(cyan) [/tmp/main.bu:demo] "echo piped\necho banana" | "wc -c" | "wcalc -h"
  = 0xd
-22:16 I ●(green) 0 | 0 | 0 [/tmp/main.bu:demo]
+22:19 I ●(green) 0 | 0 | 0 [/tmp/main.bu:demo]
 
 ```
 
@@ -179,3 +179,163 @@ demo: a_dep ^example.bu
 ```
 
 ```bu-out
+22:19 I ●(cyan) [/tmp/main.bu:a_dep] "echo hello"
+hello
+22:19 I ●(green) 0 [/tmp/main.bu:a_dep]
+22:19 I ●(cyan) [/tmp/main.bu:demo] "sleep 5"
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
+
+```
+
+Will restart the `watch` target every time `example.bu` file is modified. It
+will handle stopping the running process.
+
+# Redirects
+
+Target output can be redirected to a file. This is useful when using shells that
+don't have redirection, like Python.
+
+```bu
+demo: >my_file.txt !py
+  print "Save me in a file"
+```
+
+```bu-out
+22:19 I ●(cyan) [/tmp/main.bu:demo] "print \"Save me in a file\""
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
+
+```
+
+Similarly a file can be used for input on standard input.
+
+```bu
+make: >my_file.txt
+  print "Save me in a file"
+
+demo: <my_file.txt !py
+  import sys
+  print sys.stdin.read()
+```
+
+```bu-out
+22:19 I ●(cyan) [/tmp/main.bu:demo] "import sys\nprint sys.stdin.read()"
+Save me in a file
+
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
+
+```
+
+
+# Variables
+
+Bu does not have variables of it's own. Only environment variables are supported.
+These are passed to all targets.
+
+Single line variables are defined with the `=` operator, like so:
+
+```bu
+DEMO =I am the variable content
+
+demo:
+  echo $DEMO
+```
+
+```bu-out
+22:19 I ●(cyan) [/tmp/main.bu:demo] "echo $DEMO"
+I am the variable content
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
+
+```
+
+Multiline variables are defined exactly the same way in an indented block.
+
+```bu
+DEMO =
+    I
+    am
+    the variable
+    content
+
+demo:
+  echo "$DEMO"
+```
+
+```bu-out
+22:19 I ●(cyan) [/tmp/main.bu:demo] "echo \"$DEMO\""
+I
+am
+the variable
+content
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
+
+```
+
+Defines a variable `myvariable`. Quoting is not required as the variable value
+is taken to the end of the line.
+
+Variables are injected into the environment,
+where they can be used directly in targets as `$myvariable` in shell, or
+`os.getenv('myvariable')` from Python.
+
+Note: Because variables are injected only into the environment, they will not be
+used in target names and dependencies.
+
+## Positional arguments 
+
+`$0`, `$1`, `$*`, `$@` etc (in shell) and `sys.args` (in Python) are available as
+additional arguments passed to the bu invocation. Consider this target:
+
+```bu
+demo:
+  echo Hi, "$0"
+```
+
+```bu-out
+22:19 I ●(cyan) [/tmp/main.bu:demo] "echo Hi, \"$0\""
+Hi, demo
+22:19 I ●(green) 0 [/tmp/main.bu:demo]
+
+```
+
+and this invocation:
+
+    $ bu demo FirstArgument
+
+
+# Imports
+
+```bu-spec
+< <filepath>
+```
+
+    < foo.bu
+
+Will import foo.bu from the system path, which defaults to resolving, in order:
+
+* Current working directory `.`
+* Bu home directory `~/.bu`
+
+# Comments  
+
+Line comments only. Non-line comments are undefined, especially in situations
+where values are taken to the end of a line, e.g. variable definitions
+
+    myvariable = I am the value # this comment will be part of the value
+
+## Differences from GNU make
+
+* Each target is executed in the same shell
+* File existence is not explicitly taken to imply a dependency satisfaction
+
+# Prologue
+
+To you, designers and engineers of build systems, I present Bu.
+
+For years I have suffered your hideous constructs, your crushing assumptions,
+and your bizarre choices. The only revenge left to me is to build one that is
+worse, more disgusting, and infinitely heavier with dripping abomination, so
+that you may suffer the pain that I have suffered. Feel the gut-wrenching taste
+of bile in my mouth. Feel it, and let it sour the flavor of your day, your week
+and your month. May it lay barren the fields of your productivity.
+
+**To you, designers and engineers of build systems, I present Bu!**
