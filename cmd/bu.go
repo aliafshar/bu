@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bitbucket.org/kardianos/osext"
 	"fmt"
 	"github.com/aliafshar/bu"
 	"github.com/aliafshar/toylog"
@@ -26,28 +27,38 @@ var (
 	logo3 = "━━ ━━┛  "
 )
 
-func showVersion() {
-	toylog.Infoln(versionInfo)
+func mustExecutable() interface{} {
+	filename, err := osext.Executable()
+	if err != nil {
+		return err
+	}
+	return filename
 }
 
 func main() {
 	app.Parse(os.Args[1:])
+	if *debug {
+		toylog.Verbose()
+	}
+	toylog.Debugf("starting from %q\n", mustExecutable())
 	if !*quiet {
 		toylog.Infoln(logo1)
 		toylog.Infoln(logo2, versionInfo)
 		toylog.Infoln(logo3)
-	}
-	if *debug {
-		toylog.Verbose()
+	} else {
+		toylog.Debugln("quiet mode")
 	}
 	if *version {
+		toylog.Debugln("version and exit")
 		return
 	}
 	if *list {
+		toylog.Debugln("listing targets")
 		for _, t := range bu.List(*bufile) {
 			fmt.Println(t)
 		}
 		return
 	}
+	toylog.Debugf("running %q from %q with %q\n", *targetName, *bufile, *targetArgs)
 	bu.Run(*bufile, *targetName, *targetArgs...)
 }

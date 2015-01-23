@@ -69,3 +69,9 @@ hex:
 pipe: | count | hex
   echo piped
   echo banana
+
+long:
+  sleep 100
+
+watch: my_basic ^example.bu
+  sleep 5

@@ -82,6 +82,38 @@ demo: make ?my_file.txt
 
 # Pipes
 
+Targets can be piped into eachother.
+
+```bu
+count:
+  wc -c
+
+hex:
+  wcalc -h
+
+demo: | count | hex
+  echo piped
+  echo banana
+```
+
+Here the output of the `pipe` target is piped into the count target and then the
+hex target. Of course, all dependencies will be first run.
+
+# Watches
+
+Targets can be restarted based on watching a file for modification. This is
+probably only useful for long-running targets.
+
+```bu
+a_dep:
+  echo hello
+
+demo: a_dep ^example.bu
+  sleep 5
+```
+
+Will restart the `watch` target every time `example.bu` file is modified. It
+will handle stopping the running process.
 
 # Redirects
 

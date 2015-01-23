@@ -3,7 +3,7 @@ package bu
 import (
 	"fmt"
 	"os"
-  "os/exec"
+	"os/exec"
 	"sync"
 	"time"
 
@@ -23,7 +23,7 @@ type queue struct {
 }
 
 func (q *queue) reset() {
-  q.items = nil
+	q.items = nil
 }
 
 func (q *queue) peek() *target {
@@ -99,7 +99,6 @@ func feedback(char, color string) string {
 	}
 }
 
-
 func (w *worker) run(t *target) *result {
 	p := newPipe(w.rt, t)
 	toylog.Infof("%v [%v] %v", feedback(launchChar, "cyan"), targetDesc(t, w.rt), p.desc)
@@ -120,7 +119,6 @@ func (w *worker) run(t *target) *result {
 	return res
 }
 
-
 func (w *worker) can(t *target) bool {
 	for _, d := range t.deps {
 		if !d.can(w.rt) {
@@ -136,7 +134,7 @@ type history struct {
 }
 
 func (h *history) reset() {
-  h.log = make(map[string]bool)
+	h.log = make(map[string]bool)
 }
 
 func (h *history) do(key string) {
@@ -161,10 +159,11 @@ type runtime struct {
 	pool    *pool
 	queue   *queue
 	history *history
-  running map[int]*exec.Cmd
+	running map[int]*exec.Cmd
 	wait    *sync.WaitGroup
 	argv    []string
 	env     []string
+	restart bool
 }
 
 func (r *runtime) start() {
@@ -185,21 +184,21 @@ func (r *runtime) build(t *target) {
 			r.build(u)
 		}
 	}
-  for _, p := range t.pipe {
-    u := p.resolve(r)
-    for _, d := range u.deps {
-      v := d.resolve(r)
-      if v != nil {
-        r.build(v)
-      }
-    }
-  }
+	for _, p := range t.pipe {
+		u := p.resolve(r)
+		for _, d := range u.deps {
+			v := d.resolve(r)
+			if v != nil {
+				r.build(v)
+			}
+		}
+	}
 }
 
 func (r *runtime) reset() {
-  r.running = make(map[int]*exec.Cmd)
-  r.queue.reset()
-  r.history.reset()
+	r.running = make(map[int]*exec.Cmd)
+	r.queue.reset()
+	r.history.reset()
 }
 
 func (r *runtime) stop() {
@@ -209,42 +208,45 @@ func (r *runtime) stop() {
 	for _, cmd := range r.running {
 		cmd.Wait()
 	}
-  r.reset()
-  r.wait.Wait()
+	r.restart = true
+	r.reset()
+	r.wait.Wait()
 }
 
 func (r *runtime) run(t *target) {
-  if t.watch != "" {
-    r.runWatch(t)
-    return
-  }
-  r.runOnce(t)
+	if t.watch != "" {
+		r.runWatch(t)
+		return
+	}
+	r.runOnce(t)
 }
 
 func (r *runtime) runOnce(t *target) {
-  r.reset()
-  r.build(t)
-  r.start()
+	r.reset()
+	r.build(t)
+	r.start()
 }
 
 func (r *runtime) pollRestart(out chan bool) {
-  for {
-    select {
-    case _ = <-out:
-      r.stop()
-    }
-  }
+	for {
+		select {
+		case _ = <-out:
+			r.restart = true
+			r.stop()
+		}
+	}
 }
 
 func (r *runtime) runWatch(t *target) {
-  out := make(chan bool)
-  wt := &watcher{path: t.watch, out: out}
-  toylog.Debugf("running a watch %+v", wt)
-  go wt.watch()
-  go r.pollRestart(out)
-  for {
-    r.runOnce(t)
-  }
+	out := make(chan bool)
+	wt := &watcher{path: t.watch, out: out}
+	toylog.Debugf("running a watch %+v", wt)
+	go wt.watch()
+	go r.pollRestart(out)
+	for r.restart {
+		r.restart = false
+		r.runOnce(t)
+	}
 }
 
 func newRuntime(script *script) *runtime {
@@ -261,6 +263,7 @@ func newRuntime(script *script) *runtime {
 		wait:    &sync.WaitGroup{},
 		queue:   &queue{},
 		env:     env,
-    running: make(map[int]*exec.Cmd),
+		running: make(map[int]*exec.Cmd),
+		restart: true,
 	}
 }

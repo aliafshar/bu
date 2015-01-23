@@ -15,9 +15,8 @@ site_build: docs_samples
     $pandoc --toc --toc-depth=1 -s --template=$template -f markdown -i site/${p}.md -o site/${p}.html
   done
 
-site_dev: site_build
+site_dev: site_build ^README.md
   twistd -n web --path=site
-
 
 site_push: site_build
   cd site
@@ -31,26 +30,37 @@ site_clone:
 fmt: >test.test
   gofmt -w *.go */*.go
 
-docs_samples: !py >site/index.md
-  import tempfile, subprocess, os, sys
+docs_samples: !py
+  import subprocess, os, sys
   f = open(os.getenv('readme'))
   o = False
   buf = ['']
   for l in f:
       line = l.rstrip('\n')
-      print line
-      if line.startswith('```bu') and not line.startswith('```bu-'):
+      if line.startswith('```logo```'):
+        print '```'
+        print subprocess.check_output(["bu", "--version"], stderr=subprocess.STDOUT)
+        print '```'
+      elif line.startswith('```usage```'):
+        print '```'
+        print subprocess.check_output(["bu", "--help"], stderr=subprocess.STDOUT)
+        print '```'
+      elif line.startswith('```bu') and not line.startswith('```bu-'):
+          print line
           o = True
           buf = ['']
       elif line.startswith('```') and o:
+          print line
           o = False
-          f = tempfile.NamedTemporaryFile(delete=False)
+          f = open('/tmp/main.bu', 'w')
           f.write('\n'.join(buf + ['']))
           f.close()
           print ''
           print '```bu-out'
-          print subprocess.check_output(["bu", "-f", f.name, "demo"], stderr=subprocess.STDOUT)
+          print subprocess.check_output(["bu", "-q", "-f", f.name, "demo"], stderr=subprocess.STDOUT)
           print '```'
-          os.unlink(f.name)
       elif o == True:
+          print line
           buf.append(line)
+      else:
+          print line

@@ -28,7 +28,7 @@ const (
 	tokenEol        tokenType = iota
 	tokenQuote      tokenType = iota
 	tokenAt         tokenType = iota
-  tokenCaret      tokenType = iota
+	tokenCaret      tokenType = iota
 )
 
 var operators = map[string]tokenType{
@@ -45,7 +45,7 @@ var operators = map[string]tokenType{
 	">":  tokenRight,
 	"'":  tokenQuote,
 	"@":  tokenAt,
-  "^":  tokenCaret,
+	"^":  tokenCaret,
 }
 
 var names = map[tokenType]string{

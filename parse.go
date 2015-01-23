@@ -1,8 +1,8 @@
 package bu
 
 import (
+	"github.com/aliafshar/toylog"
 	"io"
-  "github.com/aliafshar/toylog"
 )
 
 type parser struct {
@@ -55,10 +55,10 @@ func (p *parser) createTarget(n *node) *target {
 			t.redirect.ofile = o.key
 		case opImport:
 			t.redirect.ifile = o.key
-    case opCaret:
-      t.watch = o.key
-    default:
-      toylog.Debugf("unknown operator %+v\n", o)
+		case opCaret:
+			t.watch = o.key
+		default:
+			toylog.Debugf("unknown operator %+v\n", o)
 		}
 	}
 	return t
