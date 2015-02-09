@@ -23,7 +23,8 @@ Or since it is the first target, simply:
 
     $ bu
 
-# Usage
+<h1 class="tag editorial-header__title">getting started</h1>
+<h2 class="editorial-header__subtitle">Usage</h2>
 
 ```usage```
 

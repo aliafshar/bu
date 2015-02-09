@@ -95,8 +95,8 @@ func feedback(char, color string) string {
 	if terminal.IsTerminal(int(os.Stderr.Fd())) {
 		return ansi.Color(char, color+"+b")
 	} else {
-		return feedbackChar + "(" + color + ")"
-	}
+		return feedbackChar
+  }
 }
 
 func (w *worker) run(t *target) *result {

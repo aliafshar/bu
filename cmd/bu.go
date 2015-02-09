@@ -2,11 +2,12 @@ package main
 
 import (
 	"bitbucket.org/kardianos/osext"
-	"fmt"
 	"github.com/aliafshar/bu"
 	"github.com/aliafshar/toylog"
 	"gopkg.in/alecthomas/kingpin.v1"
+  "io"
 	"os"
+  "strings"
 )
 
 var (
@@ -14,8 +15,8 @@ var (
 	bufile      = app.Flag("bufile", "Path to bu file.").Default("main.bu").Short('f').ExistingFile()
 	version     = app.Flag("version", "Print the bu version and exit.").Short('v').Bool()
 	debug       = app.Flag("debug", "Verbose logging.").Short('d').Bool()
-	list        = app.Flag("list", "List targets.").Short('l').Bool()
 	quiet       = app.Flag("quiet", "Don't be so noisy.").Short('q').Bool()
+	content     = app.Flag("content", "The script contents. Overrides bufile.").Short('c').String()
 	targetName  = app.Arg("target", "Execute the named target.").String()
 	targetArgs  = app.Arg("args", "Arguments to pass to the bu target.").Strings()
 	versionInfo = "bu, version " + bu.BuVersion
@@ -35,6 +36,7 @@ func mustExecutable() interface{} {
 	return filename
 }
 
+
 func main() {
 	app.Parse(os.Args[1:])
 	if *debug {
@@ -52,13 +54,21 @@ func main() {
 		toylog.Debugln("version and exit")
 		return
 	}
-	if *list {
-		toylog.Debugln("listing targets")
-		for _, t := range bu.List(*bufile) {
-			fmt.Println(t)
-		}
-		return
-	}
-	toylog.Debugf("running %q from %q with %q\n", *targetName, *bufile, *targetArgs)
-	bu.Run(*bufile, *targetName, *targetArgs...)
+
+  var r io.Reader
+  var n string
+  if *content == "" {
+    f, err := os.Open(*bufile)
+	  if err != nil {
+      toylog.Fatalln("Unable to open bu file.", *bufile, err)
+	  }
+	  defer f.Close()
+    r = f
+    n = *bufile
+  } else {
+    r = strings.NewReader(*content)
+    n = "<command line>"
+  }
+	toylog.Debugf("running %q from %q with %q\n", *targetName, n, *targetArgs)
+	bu.Run(r, n, *targetName, *targetArgs...)
 }

@@ -1,6 +1,7 @@
 package bu
 
 import (
+  "io"
 	"github.com/aliafshar/toylog"
 	"os"
 	"path/filepath"
@@ -57,7 +58,11 @@ func (s *script) loadFile(filename string) (*module, error) {
 		return nil, err
 	}
 	defer f.Close()
-	return s.parser.parse(s, f)
+	return s.load(f)
+}
+
+func (s *script) load(r io.Reader) (*module, error) {
+	return s.parser.parse(s, r)
 }
 
 func (s *script) Target(name string) *target {
@@ -80,11 +85,12 @@ func (s *script) aggregate() {
 	}
 }
 
-func Load(filename string, args ...string) (*script, error) {
+
+func Load(r io.Reader, filename string, args ...string) (*script, error) {
 	s := newScript()
 	s.filename = filename
 	s.args = args
-	m, err := s.loadFile(filename)
+	m, err := s.load(r)
 	if err != nil {
 		return nil, err
 	}
