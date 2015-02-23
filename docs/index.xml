@@ -29,13 +29,11 @@
       <guid>http://aliafshar.github.io/bu/docs/targets/</guid>
       <description>
 
-&lt;h1 id=&#34;targets:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Targets&lt;/h1&gt;
-
 &lt;p&gt;Targets are the fundamental building block of bu. The are a group of dependent
 tasks with multiple options. The syntax is fundamentally similar to how make
 does things, and many make scripts will run in bu.&lt;/p&gt;
 
-&lt;h2 id=&#34;your-first-target:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Your first target&lt;/h2&gt;
+&lt;h1 id=&#34;your-first-target:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Your first target&lt;/h1&gt;
 
 &lt;p&gt;Let&amp;rsquo;s look at the simplest
 target.&lt;/p&gt;
@@ -44,9 +42,9 @@ target.&lt;/p&gt;
   echo hello bu world 𝄽
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;23:04 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo hello bu world 𝄽&amp;quot;
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo hello bu world 𝄽&amp;quot;
 hello bu world 𝄽
-23:04 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;As you can see bu executes the shell script and displays the output. A target definition looks like this.&lt;/p&gt;
@@ -57,7 +55,137 @@ hello bu world 𝄽
 
 &lt;p&gt;Note that the body must be indented, but unlike Make, tabs or spaces are fine.&lt;/p&gt;
 
-&lt;h1 id=&#34;choosing-a-shell:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Choosing a shell&lt;/h1&gt;
+&lt;h1 id=&#34;dependencies:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Dependencies&lt;/h1&gt;
+
+&lt;p&gt;All dependencies of a target must be met for it to run.&lt;/p&gt;
+
+&lt;h2 id=&#34;target-dependencies:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Target dependencies&lt;/h2&gt;
+
+&lt;p&gt;A target can depend on another target by name.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;t1:
+  echo I am depended on by demo
+
+demo: t1
+  echo I depend on t1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:t1] &amp;quot;echo I am depended on by demo&amp;quot;
+I am depended on by demo
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:t1]
+10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo I depend on t1&amp;quot;
+I depend on t1
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;file-dependencies:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;File Dependencies&lt;/h2&gt;
+
+&lt;p&gt;A target may explicitly depend on the existence of a file or directory.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;make:
+  echo Blah &amp;gt; my_file.txt
+
+demo: make ?my_file.txt
+  cat my_file.txt
+  rm my_file.txt
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:make] &amp;quot;echo Blah &amp;gt; my_file.txt&amp;quot;
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:make]
+10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;cat my_file.txt\nrm my_file.txt&amp;quot;
+Blah
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;web-dependencies:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Web dependencies&lt;/h2&gt;
+
+&lt;p&gt;A target can depend on a web page being present and returning 200. The page will
+be polled until it can be contacted.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;demo: @example.com
+  echo example.com is up
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo example.com is up&amp;quot;
+example.com is up
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;pipes:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Pipes&lt;/h1&gt;
+
+&lt;p&gt;Targets can be piped into eachother.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;count:
+  wc -c
+
+hex:
+  wcalc -h
+
+demo: | count | hex
+  echo piped
+  echo banana
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo piped\necho banana&amp;quot; | &amp;quot;wc -c&amp;quot; | &amp;quot;wcalc -h&amp;quot;
+ = 0xd
+10:30 I ● 0 | 0 | 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here the output of the &lt;code&gt;pipe&lt;/code&gt; target is piped into the count target and then the
+hex target. Of course, all dependencies will be first run.&lt;/p&gt;
+
+&lt;h1 id=&#34;watches:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Watches&lt;/h1&gt;
+
+&lt;p&gt;Targets can be restarted based on watching a file for modification. This is
+probably only useful for long-running targets.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;a_dep:
+  echo hello
+
+demo: a_dep ^example.bu
+  sleep 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:a_dep] &amp;quot;echo hello&amp;quot;
+hello
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:a_dep]
+10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;sleep 0&amp;quot;
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Will restart the &lt;code&gt;watch&lt;/code&gt; target every time &lt;code&gt;example.bu&lt;/code&gt; file is modified. It
+will handle stopping the running process.&lt;/p&gt;
+
+&lt;h1 id=&#34;redirects:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Redirects&lt;/h1&gt;
+
+&lt;p&gt;Target output can be redirected to a file. This is useful when using shells that
+don&amp;rsquo;t have redirection, like Python.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;demo: &amp;gt;my_file.txt !py
+  print &amp;quot;Save me in a file&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;print \&amp;quot;Save me in a file\&amp;quot;&amp;quot;
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Similarly a file can be used for input on standard input.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;make: &amp;gt;my_file.txt
+  print &amp;quot;Save me in a file&amp;quot;
+
+demo: &amp;lt;my_file.txt !py
+  import sys
+  print sys.stdin.read()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;import sys\nprint sys.stdin.read()&amp;quot;
+Save me in a file
+
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;shell-types:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Shell types&lt;/h1&gt;
 
 &lt;p&gt;Currently only shell and python are supported. Shell (bash) is the default, so no type
 is required to be passed explicitly. For a Python target, add the type as &lt;code&gt;!py&lt;/code&gt;,
@@ -67,9 +195,9 @@ look:&lt;/p&gt;
   print &amp;quot;hello bu world 𝄽&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;23:04 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;print \&amp;quot;hello bu world 𝄽\&amp;quot;&amp;quot;
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;print \&amp;quot;hello bu world 𝄽\&amp;quot;&amp;quot;
 hello bu world 𝄽
-23:04 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+10:30 I ● 0 [&amp;lt;command line&amp;gt;:demo]
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1 id=&#34;indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Indentation and whitespace&lt;/h1&gt;
@@ -82,12 +210,12 @@ be consistent for Python scripts since Python is sensitive to this.&lt;/p&gt;
   print i
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;23:04 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;for i in range(5):\nprint i&amp;quot;
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;10:30 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;for i in range(5):\nprint i&amp;quot;
   File &amp;quot;&amp;lt;string&amp;gt;&amp;quot;, line 2
     print i
         ^
 IndentationError: expected an indented block
-23:04 E ● exit status 1 [&amp;lt;command line&amp;gt;:demo]
+10:30 E ● exit status 1 [&amp;lt;command line&amp;gt;:demo]
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>

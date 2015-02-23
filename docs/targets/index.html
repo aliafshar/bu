@@ -52,7 +52,7 @@
     <div class="wsk-layout-spacer"></div>
     <nav class="wsk-layout-navigation">
       
-        <a class="wsk-item wsk-js-ripple-effect" href="">docs</a>
+        <a class="wsk-item wsk-js-ripple-effect" href="/bu/docs/">docs</a>
       
         <a class="wsk-item wsk-js-ripple-effect" href="https://github.com/aliafshar/bu">code</a>
       
@@ -62,15 +62,33 @@
 
 
 <div class="content">
+    <h1>Targets</h1>
+    <p>Details on what targets are and how to use them</p>
+    <div class="wsk-shadow--z2 wsk-list--inline" style="padding: 24px; margin-bottom: 24px">
+    <nav id="TableOfContents">
+<ul>
+<li><a href="#your-first-target:4cf45c6a681978cec1fda939e037b3ba">Your first target</a></li>
+<li><a href="#dependencies:4cf45c6a681978cec1fda939e037b3ba">Dependencies</a>
+<ul>
+<li><a href="#target-dependencies:4cf45c6a681978cec1fda939e037b3ba">Target dependencies</a></li>
+<li><a href="#file-dependencies:4cf45c6a681978cec1fda939e037b3ba">File Dependencies</a></li>
+<li><a href="#web-dependencies:4cf45c6a681978cec1fda939e037b3ba">Web dependencies</a></li>
+</ul></li>
+<li><a href="#pipes:4cf45c6a681978cec1fda939e037b3ba">Pipes</a></li>
+<li><a href="#watches:4cf45c6a681978cec1fda939e037b3ba">Watches</a></li>
+<li><a href="#redirects:4cf45c6a681978cec1fda939e037b3ba">Redirects</a></li>
+<li><a href="#shell-types:4cf45c6a681978cec1fda939e037b3ba">Shell types</a></li>
+<li><a href="#indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba">Indentation and whitespace</a></li>
+</ul>
+</nav>
+    </div>
     
-
-<h1 id="targets:4cf45c6a681978cec1fda939e037b3ba">Targets</h1>
 
 <p>Targets are the fundamental building block of bu. The are a group of dependent
 tasks with multiple options. The syntax is fundamentally similar to how make
 does things, and many make scripts will run in bu.</p>
 
-<h2 id="your-first-target:4cf45c6a681978cec1fda939e037b3ba">Your first target</h2>
+<h1 id="your-first-target:4cf45c6a681978cec1fda939e037b3ba">Your first target</h1>
 
 <p>Let&rsquo;s look at the simplest
 target.</p>
@@ -79,9 +97,9 @@ target.</p>
   echo hello bu world 𝄽
 </code></pre>
 
-<pre><code class="language-bu-output">23:04 I ● [&lt;command line&gt;:demo] &quot;echo hello bu world 𝄽&quot;
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;echo hello bu world 𝄽&quot;
 hello bu world 𝄽
-23:04 I ● 0 [&lt;command line&gt;:demo]
+10:30 I ● 0 [&lt;command line&gt;:demo]
 </code></pre>
 
 <p>As you can see bu executes the shell script and displays the output. A target definition looks like this.</p>
@@ -92,7 +110,137 @@ hello bu world 𝄽
 
 <p>Note that the body must be indented, but unlike Make, tabs or spaces are fine.</p>
 
-<h1 id="choosing-a-shell:4cf45c6a681978cec1fda939e037b3ba">Choosing a shell</h1>
+<h1 id="dependencies:4cf45c6a681978cec1fda939e037b3ba">Dependencies</h1>
+
+<p>All dependencies of a target must be met for it to run.</p>
+
+<h2 id="target-dependencies:4cf45c6a681978cec1fda939e037b3ba">Target dependencies</h2>
+
+<p>A target can depend on another target by name.</p>
+
+<pre><code class="language-bu">t1:
+  echo I am depended on by demo
+
+demo: t1
+  echo I depend on t1
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:t1] &quot;echo I am depended on by demo&quot;
+I am depended on by demo
+10:30 I ● 0 [&lt;command line&gt;:t1]
+10:30 I ● [&lt;command line&gt;:demo] &quot;echo I depend on t1&quot;
+I depend on t1
+10:30 I ● 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<h2 id="file-dependencies:4cf45c6a681978cec1fda939e037b3ba">File Dependencies</h2>
+
+<p>A target may explicitly depend on the existence of a file or directory.</p>
+
+<pre><code class="language-bu">make:
+  echo Blah &gt; my_file.txt
+
+demo: make ?my_file.txt
+  cat my_file.txt
+  rm my_file.txt
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:make] &quot;echo Blah &gt; my_file.txt&quot;
+10:30 I ● 0 [&lt;command line&gt;:make]
+10:30 I ● [&lt;command line&gt;:demo] &quot;cat my_file.txt\nrm my_file.txt&quot;
+Blah
+10:30 I ● 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<h2 id="web-dependencies:4cf45c6a681978cec1fda939e037b3ba">Web dependencies</h2>
+
+<p>A target can depend on a web page being present and returning 200. The page will
+be polled until it can be contacted.</p>
+
+<pre><code class="language-bu">demo: @example.com
+  echo example.com is up
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;echo example.com is up&quot;
+example.com is up
+10:30 I ● 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<h1 id="pipes:4cf45c6a681978cec1fda939e037b3ba">Pipes</h1>
+
+<p>Targets can be piped into eachother.</p>
+
+<pre><code class="language-bu">count:
+  wc -c
+
+hex:
+  wcalc -h
+
+demo: | count | hex
+  echo piped
+  echo banana
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;echo piped\necho banana&quot; | &quot;wc -c&quot; | &quot;wcalc -h&quot;
+ = 0xd
+10:30 I ● 0 | 0 | 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<p>Here the output of the <code>pipe</code> target is piped into the count target and then the
+hex target. Of course, all dependencies will be first run.</p>
+
+<h1 id="watches:4cf45c6a681978cec1fda939e037b3ba">Watches</h1>
+
+<p>Targets can be restarted based on watching a file for modification. This is
+probably only useful for long-running targets.</p>
+
+<pre><code class="language-bu">a_dep:
+  echo hello
+
+demo: a_dep ^example.bu
+  sleep 0
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:a_dep] &quot;echo hello&quot;
+hello
+10:30 I ● 0 [&lt;command line&gt;:a_dep]
+10:30 I ● [&lt;command line&gt;:demo] &quot;sleep 0&quot;
+10:30 I ● 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<p>Will restart the <code>watch</code> target every time <code>example.bu</code> file is modified. It
+will handle stopping the running process.</p>
+
+<h1 id="redirects:4cf45c6a681978cec1fda939e037b3ba">Redirects</h1>
+
+<p>Target output can be redirected to a file. This is useful when using shells that
+don&rsquo;t have redirection, like Python.</p>
+
+<pre><code class="language-bu">demo: &gt;my_file.txt !py
+  print &quot;Save me in a file&quot;
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;print \&quot;Save me in a file\&quot;&quot;
+10:30 I ● 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<p>Similarly a file can be used for input on standard input.</p>
+
+<pre><code class="language-bu">make: &gt;my_file.txt
+  print &quot;Save me in a file&quot;
+
+demo: &lt;my_file.txt !py
+  import sys
+  print sys.stdin.read()
+</code></pre>
+
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;import sys\nprint sys.stdin.read()&quot;
+Save me in a file
+
+10:30 I ● 0 [&lt;command line&gt;:demo]
+</code></pre>
+
+<h1 id="shell-types:4cf45c6a681978cec1fda939e037b3ba">Shell types</h1>
 
 <p>Currently only shell and python are supported. Shell (bash) is the default, so no type
 is required to be passed explicitly. For a Python target, add the type as <code>!py</code>,
@@ -102,9 +250,9 @@ look:</p>
   print &quot;hello bu world 𝄽&quot;
 </code></pre>
 
-<pre><code class="language-bu-output">23:04 I ● [&lt;command line&gt;:demo] &quot;print \&quot;hello bu world 𝄽\&quot;&quot;
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;print \&quot;hello bu world 𝄽\&quot;&quot;
 hello bu world 𝄽
-23:04 I ● 0 [&lt;command line&gt;:demo]
+10:30 I ● 0 [&lt;command line&gt;:demo]
 </code></pre>
 
 <h1 id="indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba">Indentation and whitespace</h1>
@@ -117,12 +265,12 @@ be consistent for Python scripts since Python is sensitive to this.</p>
   print i
 </code></pre>
 
-<pre><code class="language-bu-output">23:04 I ● [&lt;command line&gt;:demo] &quot;for i in range(5):\nprint i&quot;
+<pre><code class="language-bu-output">10:30 I ● [&lt;command line&gt;:demo] &quot;for i in range(5):\nprint i&quot;
   File &quot;&lt;string&gt;&quot;, line 2
     print i
         ^
 IndentationError: expected an indented block
-23:04 E ● exit status 1 [&lt;command line&gt;:demo]
+10:30 E ● exit status 1 [&lt;command line&gt;:demo]
 </code></pre>
  
 </div>
