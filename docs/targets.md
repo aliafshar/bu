@@ -5,6 +5,7 @@ description: Details on what targets are and how to use them
 menu:
   docs:
     weight: -100
+date: 2014-01-01
 ---
 
 # Targets
