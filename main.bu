@@ -5,30 +5,20 @@ pandoc     =eval ~/.cabal/bin/pandoc
 template   =site/template.html
 repo       =https://github.com/aliafshar/bu.git
 readme     =README.md
+docs_pages =targets.md
 
 lint:
   gofmt -w *.go */*.go
 
-site_build: docs_samples
+site_build2: docs_samples
   for p in $site_pages; do
     echo  site/${p}.md
     $pandoc --toc --toc-depth=1 -s --template=$template -f markdown -i site/${p}.md -o site/${p}.html
   done
 
-site_dev: site_build ^README.md
+site_dev2: site_build ^README.md
   twistd -n web --path=site
 
-site_push: site_build
-  cd site
-  git add .
-  git commit -m "Updated docs."
-  git push origin gh-pages
-
-site_clone:
-  git clone -b gh-pages $repo site
-
-fmt: >test.test
-  gofmt -w *.go */*.go
 
 docs_samples: !py >site/index.md
   import subprocess, os, sys
@@ -64,3 +54,27 @@ docs_samples: !py >site/index.md
           buf.append(line)
       else:
           print line
+
+
+site_prebuild:
+  mkdir -p site/content/docs
+  for p in $docs_pages; do
+    cat docs/$p
+    bu-replace --in=docs/$p --out=site/content/docs/$p 
+  done
+
+site_build: site_prebuild
+  cd site
+  hugo --theme=material --buildDrafts
+
+site_dev: site_prebuild ^docs
+  cd site
+  hugo server --watch --theme=material --buildDrafts
+
+site_push: site_build
+  cd site/public
+  git commit -a -m "Updated docs."
+  git push origin gh-pages
+
+site_clone:
+  git clone -b gh-pages $repo site/public

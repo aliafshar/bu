@@ -1,0 +1,31 @@
+
+{{ template "theme/partials/header.html" . }}
+
+<div class="content" style="margin-top: 24px">
+
+
+  <div class="wsk-column-layout">
+
+
+
+  {{ range .Data.Pages }}
+  <div class="wsk-card wsk-shadow--z4 wsk-column-layout__child">
+      <div class="wsk-card--heading">
+        <h2 class="wsk-card--heading-text">{{ .Title }}</h2>
+      </div>
+      <div class="wsk-card--caption">
+        {{ .Description }}
+      </div>
+      <div class="wsk-card--lower">
+        {{ .Summary }}
+      </div>
+      <div class="wsk-card--bottom">
+        <a href="{{ .Permalink }}">Read more</a>
+      </div>
+    </div>
+  {{ end }}
+
+
+  </div>
+
+{{ template "theme/partials/footer.html" . }}

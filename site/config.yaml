@@ -1,0 +1,18 @@
+
+baseurl: "http://aliafshar.github.io/bu"
+languageCode: "en-us"
+title: "bu"
+
+menu:
+  main:
+      - Name: "code"
+        Weight: 100
+        Url: https://github.com/aliafshar/bu
+      - Name: "docs"
+      - Name: "home"
+
+params:
+  description: a task automation and build system
+  github: https://github.com/aliafshar/bu
+  license: http://www.apache.org/licenses/LICENSE-2.0
+  frontline: taking the worst ideas from make and gulp

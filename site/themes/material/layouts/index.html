@@ -1,0 +1,94 @@
+
+<html>
+<head>
+  <link href="//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel='stylesheet'>
+  <script src="{{ .Site.BaseUrl }}/js/material.min.js"></script>
+  <link rel="stylesheet" href="{{ .Site.BaseUrl }}/css/material.min.css">
+  <style>
+    pre {
+      background-color: #eee;
+      color: #666;
+      padding: 0px 24px;
+    }
+  </style>
+</head>
+<body>
+<div class="wsk-layout wsk-js-layout">
+  <div class="wsk-layout__header " style="background-color: #fff; color: #000">
+
+    <div class="wsk-layout-spacer"></div>
+    <nav class="wsk-layout-navigation">
+      {{ range .Site.Menus.main }}
+        <a class="wsk-item wsk-js-ripple-effect" href="{{ .Url }}">{{ .Name }}</a>
+      {{ end }}
+    </nav>
+    <!-- Title -->
+    <div class="wsk-layout-spacer"></div>
+  </div>
+  <div class="wsk-layout__content">
+<div class="demo-content">
+<div class="content" style="padding: 32px; text-align: center; margin-top: 48px">
+
+
+      
+    <img style="width: 96px; margin-bottom: 32px;" src="{{ .Site.BaseUrl }}/images/app-icon.png"/>
+    <div class="wsk-typography--display-1">
+      {{ .Site.Params.description }}</div>
+    <div class="wsk-typography--display-2" style="margin: 32px">&ldquo;{{ .Site.Params.frontline }}&rdquo;</div>
+
+    <a href="{{ .Site.BaseUrl }}/docs"><button class="wsk-button wsk-js-button wsk-button--raised wsk-js-ripple-effect wsk-button--colored">Get Started Now</button></a>
+    <div class="wsk-column-layout"> 
+      <pre class="wsk-column-layout__child wsk-shadow--z4" style="text-align: left">
+    <code>
+<h4>targets in Bash and Python</h4>
+hi1:
+  echo hello world!
+
+hi2: !py
+  print "hello world!"
+    </code>
+    </pre>
+
+      <pre class="wsk-column-layout__child wsk-shadow--z4" style="text-align: left">
+    <code>
+<h4>watches and redirects</h4>
+dev: dump ^index.md
+  twistd -n web --path=.
+
+dump: &gt;index.html
+  pandoc -i index.md -o index.html
+    </code>
+    </pre>
+
+      <pre class="wsk-column-layout__child wsk-shadow--z4" style="text-align: left">
+    <code>
+<h4>pipes and dependencies</h4>
+count:
+  wc -c
+
+dump: |count
+  echo hello
+    </code>
+    </pre>
+    </div>
+
+
+
+</div>
+
+
+    </div>
+  </div>
+<footer class="wsk-mini-footer">
+    <div class="wsk-mini-footer--left-section">
+      <ul class="wsk-mini-footer--link-list">
+        <li><a href="#">License</a></li>
+      </ul>
+    </div>
+      <div class="wsk-mini-footer--right-section">
+        <button class="wsk-mini-footer--social-btn"><img src="{{ .Site.BaseUrl }}/images/gh.png" /></button>
+      </div>
+  </footer>
+</div>
+</body>
+</html>

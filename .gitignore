@@ -23,4 +23,5 @@ _testmain.go
 *.test
 *.prof
 
-site/
+site/public
+site/content/docs

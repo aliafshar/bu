@@ -1,0 +1,57 @@
+<html>
+<head>
+  <link href="//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel='stylesheet'>
+  <script src="{{ .Site.BaseUrl }}/js/material.min.js"></script>
+  <link rel="stylesheet" href="{{ .Site.BaseUrl }}/css/material.min.css">
+  <style>
+    pre {
+      background-color: #eee;
+      color: #666;
+        padding: 12px;
+    }
+    h1, h2, h3 {
+      margin: 24px 0px 12px 0px;
+    }
+    .wsk-card {
+      height: 274px;
+    }
+    .wsk-card--heading {
+      height: 48px;
+      background-color: #E0E0E0;
+    }
+
+    .wsk-card--heading-text {
+      height: 48px;
+        color: #222;
+    }
+
+    .wsk-card--caption {
+      background-color: #424242;
+    }
+
+    .wsk-card--lower {
+      color: #222;
+    }
+    .content {
+      padding: 64px;
+      max-width: 1024px;
+        margin: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="wsk-layout wsk-js-layout">
+  <div class="wsk-layout__header" style="background-color: #fff; color: #666">
+
+    <a class="wsk-layout-icon" href="{{ .Site.BaseUrl }}">
+    <img class="wsk-layout-icon" src="{{ .Site.BaseUrl }}/images/app-icon.png"/>
+    </a>
+    <span class="wsk-layout-title">{{ .Section }} / <strong>{{ .Title }}</strong></span>
+    <div class="wsk-layout-spacer"></div>
+    <nav class="wsk-layout-navigation">
+      {{ range .Site.Menus.main }}
+        <a class="wsk-item wsk-js-ripple-effect" href="{{ .Url }}">{{ .Name }}</a>
+      {{ end }}
+    </nav>
+  </div>
+  <div class="wsk-layout__content">
