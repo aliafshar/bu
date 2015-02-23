@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Docs on bu</title>
+    <link>http://localhost:1313/bu/docs/</link>
+    <description>Recent content in Docs on bu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+    
+    
+    <lastBuildDate>Sun, 22 Feb 2015 20:11:06 -0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/bu/docs/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>dependencies</title>
+      <link>http://localhost:1313/bu/docs/dependencies/</link>
+      <pubDate>Sun, 22 Feb 2015 20:11:06 -0800</pubDate>
+      
+      <guid>http://localhost:1313/bu/docs/dependencies/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>variables</title>
+      <link>http://localhost:1313/bu/docs/variables/</link>
+      <pubDate>Sun, 22 Feb 2015 20:10:50 -0800</pubDate>
+      
+      <guid>http://localhost:1313/bu/docs/variables/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>start</title>
+      <link>http://localhost:1313/bu/docs/start/</link>
+      <pubDate>Sun, 15 Feb 2015 15:42:34 -0800</pubDate>
+      
+      <guid>http://localhost:1313/bu/docs/start/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>intro</title>
+      <link>http://localhost:1313/bu/docs/intro/</link>
+      <pubDate>Sun, 15 Feb 2015 15:35:16 -0800</pubDate>
+      
+      <guid>http://localhost:1313/bu/docs/intro/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Targets</title>
+      <link>http://localhost:1313/bu/docs/targets/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 &#43;0000</pubDate>
+      
+      <guid>http://localhost:1313/bu/docs/targets/</guid>
+      <description>
+
+&lt;h1 id=&#34;targets:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Targets&lt;/h1&gt;
+
+&lt;p&gt;Targets are the fundamental building block of bu. The are a group of dependent
+tasks with multiple options. The syntax is fundamentally similar to how make
+does things, and many make scripts will run in bu.&lt;/p&gt;
+
+&lt;h2 id=&#34;your-first-target:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Your first target&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s look at the simplest
+target.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;demo:
+  echo hello bu world 𝄽
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:27 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo hello bu world 𝄽&amp;quot;
+hello bu world 𝄽
+21:27 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see bu executes the shell script and displays the output. A target definition looks like this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-spec&#34;&gt;&amp;lt;target name&amp;gt;: [target dependencies...] [?file dependencies] [!type] [&amp;gt;outfile] [&amp;lt;infile] [|pipe] [^watch]
+    &amp;lt;script body&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that the body must be indented, but unlike Make, tabs or spaces are fine.&lt;/p&gt;
+
+&lt;h1 id=&#34;choosing-a-shell:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Choosing a shell&lt;/h1&gt;
+
+&lt;p&gt;Currently only shell and python are supported. Shell (bash) is the default, so no type
+is required to be passed explicitly. For a Python target, add the type as &lt;code&gt;!py&lt;/code&gt;,
+look:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;demo: !py
+  print &amp;quot;hello bu world 𝄽&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:27 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;print \&amp;quot;hello bu world 𝄽\&amp;quot;&amp;quot;
+hello bu world 𝄽
+21:27 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Indentation and whitespace&lt;/h1&gt;
+
+&lt;p&gt;Target bodies must be indented by any whitespace, tab or space. Indentation must
+be consistent for Python scripts since Python is sensitive to this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu&#34;&gt;demo: !py
+  for i in range(5):
+  print i
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:27 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;for i in range(5):\nprint i&amp;quot;
+  File &amp;quot;&amp;lt;string&amp;gt;&amp;quot;, line 2
+    print i
+        ^
+IndentationError: expected an indented block
+21:27 E ● exit status 1 [&amp;lt;command line&amp;gt;:demo]
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
