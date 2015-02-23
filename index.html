@@ -13,9 +13,11 @@
   </style>
 </head>
 <body>
-<div class="wsk-layout wsk-js-layout">
-  <div class="wsk-layout__header " style="background-color: #fff; color: #000">
 
+<div class="wsk-layout wsk-js-layout">
+
+  
+  <div class="wsk-layout__header " style="background-color: #fff; color: #000">
     <div class="wsk-layout-spacer"></div>
     <nav class="wsk-layout-navigation">
       
@@ -26,73 +28,68 @@
         <a class="wsk-item wsk-js-ripple-effect" href="https://github.com/aliafshar/bu">code</a>
       
     </nav>
-    
-    <div class="wsk-layout-spacer"></div>
   </div>
-  <div class="wsk-layout__content">
-<div class="demo-content">
-<div class="content" style="padding: 32px; text-align: center; margin-top: 48px">
 
-
-      
+  <div class="wsk-layout__content" style="padding: 32px; text-align: center; margin-top: 48px">
     <img style="width: 96px; margin-bottom: 32px;" src="http://aliafshar.github.io/bu/images/app-icon.png"/>
     <div class="wsk-typography--display-1">
       a task automation and build system</div>
     <div class="wsk-typography--display-2" style="margin: 32px">&ldquo;taking the worst ideas from make and gulp&rdquo;</div>
 
     <a href="http://aliafshar.github.io/bu/docs"><button class="wsk-button wsk-js-button wsk-button--raised wsk-js-ripple-effect wsk-button--colored">Get Started Now</button></a>
+    
     <div class="wsk-column-layout"> 
+      
+      
       <pre class="wsk-column-layout__child wsk-shadow--z4" style="text-align: left">
-    <code>
-<h4>targets in Bash and Python</h4>
+        <code>
+          <h4>targets in Bash and Python</h4>
 hi1:
   echo hello world!
 
 hi2: !py
   print "hello world!"
-    </code>
-    </pre>
+        </code>
+      </pre>
 
       <pre class="wsk-column-layout__child wsk-shadow--z4" style="text-align: left">
-    <code>
-<h4>watches and redirects</h4>
+        <code>
+          <h4>watches and redirects</h4>
 dev: dump ^index.md
   twistd -n web --path=.
 
 dump: &gt;index.html
   pandoc -i index.md -o index.html
-    </code>
-    </pre>
+        </code>
+      </pre>
 
       <pre class="wsk-column-layout__child wsk-shadow--z4" style="text-align: left">
-    <code>
-<h4>pipes and dependencies</h4>
+        <code>
+          <h4>pipes and dependencies</h4>
 count:
   wc -c
 
 dump: |count
   echo hello
-    </code>
-    </pre>
-    </div>
-
-
-
-</div>
-
-
+        </code>
+      </pre>
     </div>
   </div>
+
 <footer class="wsk-mini-footer">
     <div class="wsk-mini-footer--left-section">
       <ul class="wsk-mini-footer--link-list">
-        <li><a href="#">License</a></li>
+        <li><a href="http://www.apache.org/licenses/LICENSE-2.0">license</a></li>
+        <li><a href="https://github.com/aliafshar/bu">code</a></li>
       </ul>
     </div>
       <div class="wsk-mini-footer--right-section">
-        <button class="wsk-mini-footer--social-btn"><img src="http://aliafshar.github.io/bu/images/gh.png" /></button>
+      <ul class="wsk-mini-footer--link-list">
+        <li>bu <strong>a task automation and build system</strong></li>
+      </ul>
       </div>
   </footer>
 </div>
 </body>
 </html>
+

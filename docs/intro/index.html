@@ -3,8 +3,8 @@
 <html>
 <head>
   <link href="//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel='stylesheet'>
-  <script src="http://aliafshar.github.io/bu/js/material.min.js"></script>
-  <link rel="stylesheet" href="http://aliafshar.github.io/bu/css/material.min.css">
+  <script src="http://localhost:1313/bu/js/material.min.js"></script>
+  <link rel="stylesheet" href="http://localhost:1313/bu/css/material.min.css">
   <style>
     pre {
       background-color: #eee;
@@ -45,8 +45,8 @@
 <div class="wsk-layout wsk-js-layout">
   <div class="wsk-layout__header" style="background-color: #fff; color: #666">
 
-    <a class="wsk-layout-icon" href="http://aliafshar.github.io/bu">
-    <img class="wsk-layout-icon" src="http://aliafshar.github.io/bu/images/app-icon.png"/>
+    <a class="wsk-layout-icon" href="http://localhost:1313/bu">
+    <img class="wsk-layout-icon" src="http://localhost:1313/bu/images/app-icon.png"/>
     </a>
     <span class="wsk-layout-title">docs / <strong>intro</strong></span>
     <div class="wsk-layout-spacer"></div>
@@ -66,25 +66,23 @@
 <div class="content">
      
 </div>
-
 <footer class="wsk-mini-footer">
     <div class="wsk-mini-footer--left-section">
-      <div class="wsk-logo">
-        bu <strong>a task automation and build system</strong>
-      </div>
       <ul class="wsk-mini-footer--link-list">
-        <li><a href="#">Help</a></li>
-        <li><a href="#">Privacy &amp; Terms</a></li>
+        <li><a href="http://www.apache.org/licenses/LICENSE-2.0">license</a></li>
+        <li><a href="https://github.com/aliafshar/bu">code</a></li>
       </ul>
     </div>
       <div class="wsk-mini-footer--right-section">
-        <button class="wsk-mini-footer--social-btn"><img src="http://aliafshar.github.io/bu/images/gh.png" /></button>
-        <button class="wsk-mini-footer--social-btn"></button>
-        <button class="wsk-mini-footer--social-btn"></button>
-        <button class="wsk-mini-footer--social-btn"></button>
+      <ul class="wsk-mini-footer--link-list">
+        <li>bu <strong>a task automation and build system</strong></li>
+      </ul>
       </div>
   </footer>
 </div>
-</body>
+<script>document.write('<script src="http://'
+        + (location.host || 'localhost').split(':')[0]
+		+ ':1313/livereload.js?mindelay=10"></'
+        + 'script>')</script></body>
 </html>
 
