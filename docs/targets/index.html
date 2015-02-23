@@ -81,9 +81,9 @@ target.</p>
   echo hello bu world 𝄽
 </code></pre>
 
-<pre><code class="language-bu-output">21:44 I ● [&lt;command line&gt;:demo] &quot;echo hello bu world 𝄽&quot;
+<pre><code class="language-bu-output">21:46 I ● [&lt;command line&gt;:demo] &quot;echo hello bu world 𝄽&quot;
 hello bu world 𝄽
-21:44 I ● 0 [&lt;command line&gt;:demo]
+21:46 I ● 0 [&lt;command line&gt;:demo]
 </code></pre>
 
 <p>As you can see bu executes the shell script and displays the output. A target definition looks like this.</p>
@@ -104,9 +104,9 @@ look:</p>
   print &quot;hello bu world 𝄽&quot;
 </code></pre>
 
-<pre><code class="language-bu-output">21:44 I ● [&lt;command line&gt;:demo] &quot;print \&quot;hello bu world 𝄽\&quot;&quot;
+<pre><code class="language-bu-output">21:46 I ● [&lt;command line&gt;:demo] &quot;print \&quot;hello bu world 𝄽\&quot;&quot;
 hello bu world 𝄽
-21:44 I ● 0 [&lt;command line&gt;:demo]
+21:46 I ● 0 [&lt;command line&gt;:demo]
 </code></pre>
 
 <h1 id="indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba">Indentation and whitespace</h1>
@@ -119,12 +119,12 @@ be consistent for Python scripts since Python is sensitive to this.</p>
   print i
 </code></pre>
 
-<pre><code class="language-bu-output">21:44 I ● [&lt;command line&gt;:demo] &quot;for i in range(5):\nprint i&quot;
+<pre><code class="language-bu-output">21:46 I ● [&lt;command line&gt;:demo] &quot;for i in range(5):\nprint i&quot;
   File &quot;&lt;string&gt;&quot;, line 2
     print i
         ^
 IndentationError: expected an indented block
-21:44 E ● exit status 1 [&lt;command line&gt;:demo]
+21:46 E ● exit status 1 [&lt;command line&gt;:demo]
 </code></pre>
  
 </div>

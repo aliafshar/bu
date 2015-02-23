@@ -71,9 +71,9 @@ target.&lt;/p&gt;
   echo hello bu world 𝄽
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:44 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo hello bu world 𝄽&amp;quot;
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:46 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;echo hello bu world 𝄽&amp;quot;
 hello bu world 𝄽
-21:44 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+21:46 I ● 0 [&amp;lt;command line&amp;gt;:demo]
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;As you can see bu executes the shell script and displays the output. A target definition looks like this.&lt;/p&gt;
@@ -94,9 +94,9 @@ look:&lt;/p&gt;
   print &amp;quot;hello bu world 𝄽&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:44 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;print \&amp;quot;hello bu world 𝄽\&amp;quot;&amp;quot;
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:46 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;print \&amp;quot;hello bu world 𝄽\&amp;quot;&amp;quot;
 hello bu world 𝄽
-21:44 I ● 0 [&amp;lt;command line&amp;gt;:demo]
+21:46 I ● 0 [&amp;lt;command line&amp;gt;:demo]
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h1 id=&#34;indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba&#34;&gt;Indentation and whitespace&lt;/h1&gt;
@@ -109,12 +109,12 @@ be consistent for Python scripts since Python is sensitive to this.&lt;/p&gt;
   print i
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:44 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;for i in range(5):\nprint i&amp;quot;
+&lt;pre&gt;&lt;code class=&#34;language-bu-output&#34;&gt;21:46 I ● [&amp;lt;command line&amp;gt;:demo] &amp;quot;for i in range(5):\nprint i&amp;quot;
   File &amp;quot;&amp;lt;string&amp;gt;&amp;quot;, line 2
     print i
         ^
 IndentationError: expected an indented block
-21:44 E ● exit status 1 [&amp;lt;command line&amp;gt;:demo]
+21:46 E ● exit status 1 [&amp;lt;command line&amp;gt;:demo]
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
