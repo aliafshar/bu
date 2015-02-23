@@ -3,8 +3,8 @@
 <html>
 <head>
   <link href="//fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" rel='stylesheet'>
-  <script src="http://localhost:1313/bu/js/material.min.js"></script>
-  <link rel="stylesheet" href="http://localhost:1313/bu/css/material.min.css">
+  <script src="http://aliafshar.github.io/bu/js/material.min.js"></script>
+  <link rel="stylesheet" href="http://aliafshar.github.io/bu/css/material.min.css">
   <style>
     pre {
       background-color: #eee;
@@ -45,8 +45,8 @@
 <div class="wsk-layout wsk-js-layout">
   <div class="wsk-layout__header" style="background-color: #fff; color: #666">
 
-    <a class="wsk-layout-icon" href="http://localhost:1313/bu">
-    <img class="wsk-layout-icon" src="http://localhost:1313/bu/images/app-icon.png"/>
+    <a class="wsk-layout-icon" href="http://aliafshar.github.io/bu">
+    <img class="wsk-layout-icon" src="http://aliafshar.github.io/bu/images/app-icon.png"/>
     </a>
     <span class="wsk-layout-title">docs / <strong>Targets</strong></span>
     <div class="wsk-layout-spacer"></div>
@@ -81,9 +81,9 @@ target.</p>
   echo hello bu world 𝄽
 </code></pre>
 
-<pre><code class="language-bu-output">21:27 I ● [&lt;command line&gt;:demo] &quot;echo hello bu world 𝄽&quot;
+<pre><code class="language-bu-output">21:44 I ● [&lt;command line&gt;:demo] &quot;echo hello bu world 𝄽&quot;
 hello bu world 𝄽
-21:27 I ● 0 [&lt;command line&gt;:demo]
+21:44 I ● 0 [&lt;command line&gt;:demo]
 </code></pre>
 
 <p>As you can see bu executes the shell script and displays the output. A target definition looks like this.</p>
@@ -104,9 +104,9 @@ look:</p>
   print &quot;hello bu world 𝄽&quot;
 </code></pre>
 
-<pre><code class="language-bu-output">21:27 I ● [&lt;command line&gt;:demo] &quot;print \&quot;hello bu world 𝄽\&quot;&quot;
+<pre><code class="language-bu-output">21:44 I ● [&lt;command line&gt;:demo] &quot;print \&quot;hello bu world 𝄽\&quot;&quot;
 hello bu world 𝄽
-21:27 I ● 0 [&lt;command line&gt;:demo]
+21:44 I ● 0 [&lt;command line&gt;:demo]
 </code></pre>
 
 <h1 id="indentation-and-whitespace:4cf45c6a681978cec1fda939e037b3ba">Indentation and whitespace</h1>
@@ -119,12 +119,12 @@ be consistent for Python scripts since Python is sensitive to this.</p>
   print i
 </code></pre>
 
-<pre><code class="language-bu-output">21:27 I ● [&lt;command line&gt;:demo] &quot;for i in range(5):\nprint i&quot;
+<pre><code class="language-bu-output">21:44 I ● [&lt;command line&gt;:demo] &quot;for i in range(5):\nprint i&quot;
   File &quot;&lt;string&gt;&quot;, line 2
     print i
         ^
 IndentationError: expected an indented block
-21:27 E ● exit status 1 [&lt;command line&gt;:demo]
+21:44 E ● exit status 1 [&lt;command line&gt;:demo]
 </code></pre>
  
 </div>
@@ -140,16 +140,13 @@ IndentationError: expected an indented block
       </ul>
     </div>
       <div class="wsk-mini-footer--right-section">
-        <button class="wsk-mini-footer--social-btn"><img src="http://localhost:1313/bu/images/gh.png" /></button>
+        <button class="wsk-mini-footer--social-btn"><img src="http://aliafshar.github.io/bu/images/gh.png" /></button>
         <button class="wsk-mini-footer--social-btn"></button>
         <button class="wsk-mini-footer--social-btn"></button>
         <button class="wsk-mini-footer--social-btn"></button>
       </div>
   </footer>
 </div>
-<script>document.write('<script src="http://'
-        + (location.host || 'localhost').split(':')[0]
-		+ ':1313/livereload.js?mindelay=10"></'
-        + 'script>')</script></body>
+</body>
 </html>
 
