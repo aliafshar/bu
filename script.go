@@ -1,8 +1,8 @@
 package bu
 
 import (
-  "io"
 	"github.com/aliafshar/toylog"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -84,7 +84,6 @@ func (s *script) aggregate() {
 		s.setvars = append(s.setvars, m.setvars...)
 	}
 }
-
 
 func Load(r io.Reader, filename string, args ...string) (*script, error) {
 	s := newScript()

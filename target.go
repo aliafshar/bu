@@ -7,7 +7,7 @@ type target struct {
 	deps     []dependency
 	pipe     []dependency
 	redirect *redirect
-	watch    string
+	watch    []string
 }
 
 type result struct {

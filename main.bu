@@ -5,7 +5,7 @@ pandoc     =eval ~/.cabal/bin/pandoc
 template   =site/template.html
 repo       =https://github.com/aliafshar/bu.git
 readme     =README.md
-docs_pages =targets.md
+docs_pages =targets.md getting-started.md
 
 lint:
   gofmt -w *.go */*.go
@@ -59,7 +59,7 @@ docs_samples: !py >site/index.md
 site_prebuild:
   mkdir -p site/content/docs
   for p in $docs_pages; do
-    cat docs/$p
+    echo docs/$p
     bu-replace --in=docs/$p --out=site/content/docs/$p 
   done
 

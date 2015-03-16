@@ -5,9 +5,9 @@ import (
 	"github.com/aliafshar/bu"
 	"github.com/aliafshar/toylog"
 	"gopkg.in/alecthomas/kingpin.v1"
-  "io"
+	"io"
 	"os"
-  "strings"
+	"strings"
 )
 
 var (
@@ -36,7 +36,6 @@ func mustExecutable() interface{} {
 	return filename
 }
 
-
 func main() {
 	app.Parse(os.Args[1:])
 	if *debug {
@@ -55,20 +54,20 @@ func main() {
 		return
 	}
 
-  var r io.Reader
-  var n string
-  if *content == "" {
-    f, err := os.Open(*bufile)
-	  if err != nil {
-      toylog.Fatalln("Unable to open bu file.", *bufile, err)
-	  }
-	  defer f.Close()
-    r = f
-    n = *bufile
-  } else {
-    r = strings.NewReader(*content)
-    n = "<command line>"
-  }
+	var r io.Reader
+	var n string
+	if *content == "" {
+		f, err := os.Open(*bufile)
+		if err != nil {
+			toylog.Fatalln("Unable to open bu file.", *bufile, err)
+		}
+		defer f.Close()
+		r = f
+		n = *bufile
+	} else {
+		r = strings.NewReader(*content)
+		n = "<command line>"
+	}
 	toylog.Debugf("running %q from %q with %q\n", *targetName, n, *targetArgs)
 	bu.Run(r, n, *targetName, *targetArgs...)
 }

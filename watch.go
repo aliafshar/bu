@@ -6,8 +6,8 @@ import (
 )
 
 type watcher struct {
-	path string
-	out  chan bool
+	paths []string
+	out   chan bool
 }
 
 func (w *watcher) watch() error {
@@ -15,9 +15,11 @@ func (w *watcher) watch() error {
 	if err != nil {
 		return err
 	}
-	err = watcher.Watch(w.path)
-	if err != nil {
-		return err
+	for _, p := range w.paths {
+		err = watcher.Watch(p)
+		if err != nil {
+			return err
+		}
 	}
 	for {
 		select {
@@ -28,7 +30,7 @@ func (w *watcher) watch() error {
 			}
 		case err := <-watcher.Error:
 			w.out <- true
-			toylog.Errorf("error watching %q, %q\n", w.path, err)
+			toylog.Errorf("error watching %q, %q\n", w.paths, err)
 		}
 	}
 	return nil

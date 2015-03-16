@@ -5,11 +5,12 @@ title: "bu"
 
 menu:
   main:
-      - Name: "code"
-        Weight: 100
-        Url: https://github.com/aliafshar/bu
       - Name: "docs"
-      - Name: "home"
+        Url: /docs
+        Weight: 2
+      - Name: "code"
+        Url: https://github.com/aliafshar/bu
+        Weight: 3
 
 params:
   description: a task automation and build system

@@ -56,7 +56,7 @@ func (p *parser) createTarget(n *node) *target {
 		case opImport:
 			t.redirect.ifile = o.key
 		case opCaret:
-			t.watch = o.key
+			t.watch = append(t.watch, o.key)
 		default:
 			toylog.Debugf("unknown operator %+v\n", o)
 		}

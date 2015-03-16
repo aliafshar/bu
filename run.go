@@ -96,7 +96,7 @@ func feedback(char, color string) string {
 		return ansi.Color(char, color+"+b")
 	} else {
 		return feedbackChar
-  }
+	}
 }
 
 func (w *worker) run(t *target) *result {
@@ -214,7 +214,7 @@ func (r *runtime) stop() {
 }
 
 func (r *runtime) run(t *target) {
-	if t.watch != "" {
+	if len(t.watch) > 0 {
 		r.runWatch(t)
 		return
 	}
@@ -239,7 +239,7 @@ func (r *runtime) pollRestart(out chan bool) {
 
 func (r *runtime) runWatch(t *target) {
 	out := make(chan bool)
-	wt := &watcher{path: t.watch, out: out}
+	wt := &watcher{paths: t.watch, out: out}
 	toylog.Debugf("running a watch %+v", wt)
 	go wt.watch()
 	go r.pollRestart(out)

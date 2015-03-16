@@ -2,10 +2,9 @@ package bu
 
 import (
 	"github.com/aliafshar/toylog"
-  "io"
+	"io"
 	"sort"
 )
-
 
 func Run(r io.Reader, filename, targetName string, args ...string) {
 	s, _ := Load(r, filename, args...)
